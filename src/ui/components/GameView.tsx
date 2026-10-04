@@ -16,7 +16,9 @@ export function GameView({ config, seats, endActions }: GameViewProps) {
   const { state, end, placeAsHuman, isHumanTurn } = useGame(config, seats);
   const [hovered, setHovered] = useState<Position | null>(null);
   const score = scoreBoard(state.board);
-  const hoveredOnHumanTurn = isHumanTurn ? hovered : null;
+  const isHoveredCellEmpty =
+    hovered !== null && state.board[hovered.row]?.[hovered.column] === null;
+  const hoveredOnHumanTurn = isHumanTurn && isHoveredCellEmpty ? hovered : null;
 
   return (
     <div className="game">

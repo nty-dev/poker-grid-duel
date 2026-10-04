@@ -76,6 +76,11 @@ describe('running a bot', () => {
     ],
     ['a bare number', 'return 7;', 'returned 7'],
     ['nothing', 'return undefined;', 'returned undefined'],
+    [
+      'an object that contains itself, which JSON cannot print',
+      'const loop = {}; loop.self = loop; return loop;',
+      'returned [object Object]',
+    ],
   ])('turns %s into a forfeit', (_what, body, detail) => {
     expect(askBotWithBody(body)).toEqual({ ok: false, reason: 'invalid_move', detail });
   });

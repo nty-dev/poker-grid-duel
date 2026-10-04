@@ -13,6 +13,7 @@ describe('parseArgs', () => {
     ['an odd number of games, because games are played in pairs', '--games=7'],
     ['a seed that is not an integer', '--seed=1.5'],
     ['a flag it does not know', '--colour=red'],
+    ['a flag with no value', '--seed='],
   ])('rejects %s', (_what, argument) => {
     expect(parseArgs([argument]).ok).toBe(false);
   });

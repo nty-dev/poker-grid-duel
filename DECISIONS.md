@@ -130,7 +130,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
   - **Each bot owns its random number generator.** `createBotPlayer(source, rngSeed)` seeds it once and the bot keeps drawing from it for as long as it lives. The game knows nothing about it: `chooseMove(view)` takes only the view. The tournament seeds each bot from `--seed` and the bot's id, so a run is reproducible; the browser seeds it at random for each game. An earlier version reseeded the helpers on every move from the game's seed and the move number, which made each decision a pure function of the view but tied the bot's randomness to the game's seed and leaked that detail into every caller.
   - Helpers **validate and throw** on misuse (a position off the board, an occupied cell, not 5 cards). A clear error that forfeits the game beats silently returning garbage.
   - `evaluateHand` takes exactly 5 cards: every finished line has 5. Partial-line heuristics are the bot's own business (Greedy computes its own).
-- **Trade-offs:** Per-move helper creation costs one tiny closure per move. Bots that want cross-move randomness can't get it, which is intended.
+- **Trade-offs:** A bot's choice now depends on how many random numbers it drew earlier, so one game cannot be replayed on its own: reproducing it means re-running the match from the start with the same seeds.
 
 ### D18. Bots run in-process, through one validation path
 - **Context:** A bot has to be called from the browser game, the tournament CLI and the tests. The rules for what counts as a legal answer must not differ between them.

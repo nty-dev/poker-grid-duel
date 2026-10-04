@@ -12,8 +12,9 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   const flagValues = new Map<string, string>();
   for (const argument of argv) {
     const match = FLAG_PATTERN.exec(argument);
-    if (!match) return { ok: false, error: `Unrecognised argument "${argument}"` };
-    flagValues.set(match[1] ?? '', match[2] ?? '');
+    const [, flag, value] = match ?? [];
+    if (!flag || !value) return { ok: false, error: `Unrecognised argument "${argument}"` };
+    flagValues.set(flag, value);
   }
   const unknownFlag = [...flagValues.keys()].find((flag) => !KNOWN_FLAGS.includes(flag));
   if (unknownFlag !== undefined) return { ok: false, error: `Unknown flag --${unknownFlag}` };

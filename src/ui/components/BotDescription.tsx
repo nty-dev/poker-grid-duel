@@ -4,9 +4,8 @@ import type { PresetBot, PresetId } from '../../bots/types';
 const HOW_IT_PLAYS: Record<PresetId, ReactNode> = {
   random: (
     <p>
-      Random picks one of the empty cells, each with the same chance. It has no strategy, which
-      makes it the reference point: the other two bots are rated by how much better they do than
-      Random.
+      Random places each card in one of the empty cells, each with the same chance. It disregards
+      everything it can see: the cards on the board, the card it is placing and the next card.
     </p>
   ),
 

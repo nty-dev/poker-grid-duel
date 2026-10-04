@@ -14,11 +14,17 @@ export function compileTrustedBotSource(source: string): ChooseMove {
   return chooseMove as ChooseMove;
 }
 
+function toJsonIfPossible(value: unknown): string | undefined {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return undefined;
+  }
+}
+
 function describeBotOutput(value: unknown): string {
   if (value instanceof Error) return `${value.name}: ${value.message}`;
-  const json: string | undefined = JSON.stringify(value);
-  const hasNoJsonForm = json === undefined;
-  return hasNoJsonForm ? String(value) : json;
+  return toJsonIfPossible(value) ?? String(value);
 }
 
 function isValidPosition(answer: unknown): answer is Position {
