@@ -9,15 +9,15 @@ for (let row = 0; row < BOARD_SIZE; row++) {
 }
 
 function chooseMove(view, helpers) {
-  const futuresSharedByAllCandidates = sampleFutures(view, helpers);
+  const sampledFutures = sampleFutures(view, helpers);
 
   let bestPosition = null;
   let bestTotalLead = -Infinity;
   for (const candidate of helpers.emptyPositions(view.board)) {
     let totalLead = 0;
-    for (const future of futuresSharedByAllCandidates) {
+    for (const future of sampledFutures) {
       const finalBoard = boardAfterRandomFinish(view, candidate, future);
-      totalLead += myLeadOnFullBoard(finalBoard, view.mySeat, helpers);
+      totalLead += myScoreLead(finalBoard, view.mySeat, helpers);
     }
     if (totalLead > bestTotalLead) {
       bestPosition = candidate;
@@ -31,9 +31,9 @@ function sampleFutures(view, helpers) {
   const unseenCards = cardsNotYetSeen(view);
   const futures = [];
   for (let playout = 0; playout < PLAYOUTS; playout++) {
-    const guessedDeckOrder = helpers.shuffle(unseenCards);
+    const shuffledUnseen = helpers.shuffle(unseenCards);
     futures.push({
-      cardsInDealOrder: view.nextCard ? [view.nextCard].concat(guessedDeckOrder) : guessedDeckOrder,
+      cardsInDealOrder: view.nextCard ? [view.nextCard].concat(shuffledUnseen) : shuffledUnseen,
       positionsInFillOrder: helpers.shuffle(ALL_POSITIONS),
     });
   }
@@ -63,7 +63,7 @@ function boardAfterRandomFinish(view, candidate, future) {
   return board;
 }
 
-function myLeadOnFullBoard(board, mySeat, helpers) {
+function myScoreLead(board, mySeat, helpers) {
   let rowsScore = 0;
   let columnsScore = 0;
   for (let lineNumber = 0; lineNumber < BOARD_SIZE; lineNumber++) {

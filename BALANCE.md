@@ -14,4 +14,4 @@ Random is anchored at 800. Each stronger bot is chained off its match against th
 
 These ratings are in [`src/bots/presets/catalog.ts`](src/bots/presets/catalog.ts).
 
-**Note:** these runs predate two later changes: the switch to the `seedrandom` generator, and ranks stored as labels. The first changed which cards each seed deals. Re-running `npm run sim` gives statistically similar ratings, not the identical games recorded here: `npm run sim -- --games=200 --seed=1` currently gives 800 / 1390 / 1650.
+**Note:** these runs predate later changes to how random numbers are generated: the switch to the `seedrandom` generator, and each bot owning its own generator. Both changed which games a given seed produces. Re-running `npm run sim` gives statistically similar ratings, not the identical games recorded here: `npm run sim -- --games=200 --seed=1` currently gives 800 / 1286 / 1516. A 200-game run is a rough estimate, because near a 95% win rate a few games move the Elo gap by dozens of points.

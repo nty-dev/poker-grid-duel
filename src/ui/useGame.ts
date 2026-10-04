@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { seedForMove } from '../bots/runner';
 import type { BotPlayer, ForfeitReason } from '../bots/types';
 import { isGameOver, newGame, step } from '../engine/game';
 import { scoreBoard } from '../engine/scoring';
 import type { BoardScore, GameConfig, GameError, Position, Seat } from '../engine/types';
 import { toBotView } from '../engine/botView';
 
-// Long enough for a human to see what the bot did.
-const BOT_MOVE_DELAY_MS = 400;
+const BOT_THINKING_DISPLAY_MS = 400;
 
 type Participant =
   | { readonly kind: 'human'; readonly name: string }
@@ -15,10 +13,10 @@ type Participant =
 
 export type Seats = Readonly<Record<Seat, Participant>>;
 
-export function assignSeats(seatOfFirst: Seat, first: Participant, second: Participant): Seats {
-  return seatOfFirst === 'rows'
-    ? { rows: first, columns: second }
-    : { rows: second, columns: first };
+export function assignSeats(seat: Seat, participant: Participant, opponent: Participant): Seats {
+  return seat === 'rows'
+    ? { rows: participant, columns: opponent }
+    : { rows: opponent, columns: participant };
 }
 
 export type GameEnd =
@@ -56,8 +54,7 @@ export function useGame(config: GameConfig, seats: Seats) {
     const seat = state.toMove;
     const view = toBotView(state, seat);
     const moveTimer = setTimeout(() => {
-      const randomSeed = seedForMove(config.seed, view.moveNumber);
-      const decision = participantToMove.player.chooseMove(view, randomSeed);
+      const decision = participantToMove.player.chooseMove(view);
       if (!decision.ok) {
         setEnd({ kind: 'forfeit', seat, reason: decision.reason, detail: decision.detail });
         return;
@@ -66,9 +63,9 @@ export function useGame(config: GameConfig, seats: Seats) {
       if (engineError) {
         setEnd({ kind: 'forfeit', seat, reason: 'invalid_move', detail: engineError });
       }
-    }, BOT_MOVE_DELAY_MS);
+    }, BOT_THINKING_DISPLAY_MS);
     return () => clearTimeout(moveTimer);
-  }, [state, isInProgress, participantToMove, config.seed, placeCurrentCard]);
+  }, [state, isInProgress, participantToMove, placeCurrentCard]);
 
   const placeAsHuman = (position: Position) => {
     if (isHumanTurn) placeCurrentCard(position);

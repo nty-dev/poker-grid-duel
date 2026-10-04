@@ -25,18 +25,16 @@ function assertIsLineNumber(lineNumber: number): void {
 }
 
 function assertIsOnBoard(position: Position): void {
-  const isPosition = typeof position === 'object' && position !== null && isOnBoard(position);
-  if (!isPosition) {
+  const isValidPosition = typeof position === 'object' && position !== null && isOnBoard(position);
+  if (!isValidPosition) {
     throw new RangeError(
       `position must be { row, column } with both 0–${BOARD_SIZE - 1}, got ${JSON.stringify(position)}`,
     );
   }
 }
 
-// The bots are plain JavaScript, so the compiler cannot check their calls.
-// Each helper checks its arguments and throws a clear error instead.
-export function createHelpers(randomSeed: Seed): BotHelpers {
-  const rng = createRng(randomSeed);
+export function createBotHelpers(rngSeed: Seed): BotHelpers {
+  const rng = createRng(rngSeed);
   return {
     emptyPositions(board) {
       assertIsBoard(board);

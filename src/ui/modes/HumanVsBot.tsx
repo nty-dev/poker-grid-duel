@@ -14,40 +14,51 @@ interface Setup {
   readonly humanMovesFirst: boolean;
 }
 
-interface Match {
-  readonly id: number;
+interface StartedGame {
+  readonly gameNumber: number;
   readonly opponent: PresetBot;
   readonly config: GameConfig;
   readonly seats: Seats;
 }
 
-function newMatch({ humanSeat, humanMovesFirst }: Setup, opponent: PresetBot, id: number): Match {
+function startGame(
+  { humanSeat, humanMovesFirst }: Setup,
+  opponent: PresetBot,
+  gameNumber: number,
+): StartedGame {
   const seats = assignSeats(
     humanSeat,
     { kind: 'human', name: 'You' },
-    { kind: 'bot', name: opponent.name, player: createBotPlayer(opponent.source) },
+    {
+      kind: 'bot',
+      name: opponent.name,
+      player: createBotPlayer(opponent.source, randomGameSeed()),
+    },
   );
   const firstMover = humanMovesFirst ? humanSeat : otherSeat(humanSeat);
-  return { id, opponent, seats, config: { seed: randomGameSeed(), firstMover } };
+  return { gameNumber, opponent, seats, config: { seed: randomGameSeed(), firstMover } };
 }
 
 export function HumanVsBot() {
   const [setup, setSetup] = useState<Setup>({ humanSeat: 'rows', humanMovesFirst: true });
-  const [match, setMatch] = useState<Match | null>(null);
+  const [startedGame, setStartedGame] = useState<StartedGame | null>(null);
 
-  if (match) {
+  if (startedGame) {
     return (
       <GameView
-        // A new key discards the old game's state, so each match starts clean.
-        key={match.id}
-        config={match.config}
-        seats={match.seats}
+        key={startedGame.gameNumber}
+        config={startedGame.config}
+        seats={startedGame.seats}
         endActions={
           <>
-            <button onClick={() => setMatch(newMatch(setup, match.opponent, match.id + 1))}>
+            <button
+              onClick={() =>
+                setStartedGame(startGame(setup, startedGame.opponent, startedGame.gameNumber + 1))
+              }
+            >
               Play again
             </button>
-            <button className="secondary" onClick={() => setMatch(null)}>
+            <button className="secondary" onClick={() => setStartedGame(null)}>
               Change opponent
             </button>
           </>
@@ -89,7 +100,10 @@ export function HumanVsBot() {
           ))}
         </fieldset>
       </section>
-      <OpponentPicker bots={PRESET_BOTS} onPick={(bot) => setMatch(newMatch(setup, bot, 1))} />
+      <OpponentPicker
+        bots={PRESET_BOTS}
+        onPick={(bot) => setStartedGame(startGame(setup, bot, 1))}
+      />
     </main>
   );
 }

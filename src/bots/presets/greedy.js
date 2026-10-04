@@ -9,7 +9,7 @@ const BONUS_PAIR_CAN_IMPROVE = 1;
 const BONUS_TRIPS_CAN_IMPROVE = 3;
 const BONUS_PER_CARD_TOWARDS_FLUSH = 1;
 const BONUS_PER_CARD_TOWARDS_STRAIGHT = 1;
-const FEWEST_CARDS_THAT_SHOW_A_DRAW = 2;
+const MIN_CARDS_FOR_DRAW_BONUS = 2;
 
 const RANKS_LOW_TO_HIGH = '23456789TJQKA';
 const VALUE_OF_LOWEST_RANK = 2;
@@ -25,8 +25,14 @@ function chooseMove(view, helpers) {
   let bestAdvantage = -Infinity;
   for (const position of helpers.emptyPositions(view.board)) {
     const boardAfter = helpers.place(view.board, position, view.currentCard);
-    const myGain = worthGained(view.board, boardAfter, position, myLineKind, helpers);
-    const opponentGain = worthGained(view.board, boardAfter, position, opponentLineKind, helpers);
+    const myGain = lineWorthGained(view.board, boardAfter, position, myLineKind, helpers);
+    const opponentGain = lineWorthGained(
+      view.board,
+      boardAfter,
+      position,
+      opponentLineKind,
+      helpers,
+    );
     const advantage = myGain - opponentGain;
     if (advantage > bestAdvantage) {
       bestPosition = position;
@@ -36,7 +42,7 @@ function chooseMove(view, helpers) {
   return bestPosition;
 }
 
-function worthGained(boardBefore, boardAfter, position, lineKind, helpers) {
+function lineWorthGained(boardBefore, boardAfter, position, lineKind, helpers) {
   const lineNumber = lineKind === 'row' ? position.row : position.column;
   const lineBefore = helpers.lineOf(boardBefore, lineKind, lineNumber);
   const lineAfter = helpers.lineOf(boardAfter, lineKind, lineNumber);
@@ -50,8 +56,8 @@ function lineWorth(line, helpers) {
 }
 
 function worthOfUnfinishedLine(cards) {
-  let worth = worthOfSameRankGroups(sameRankGroupSizesDescending(cards));
-  if (cards.length >= FEWEST_CARDS_THAT_SHOW_A_DRAW) {
+  let worth = worthOfSameRankGroups(rankGroupSizesLargestFirst(cards));
+  if (cards.length >= MIN_CARDS_FOR_DRAW_BONUS) {
     const isAllOneSuit = cards.every((card) => card.suit === cards[0].suit);
     if (isAllOneSuit) worth += BONUS_PER_CARD_TOWARDS_FLUSH * cards.length;
     if (canStillBecomeStraight(cards)) worth += BONUS_PER_CARD_TOWARDS_STRAIGHT * cards.length;
@@ -59,8 +65,8 @@ function worthOfUnfinishedLine(cards) {
   return worth;
 }
 
-function worthOfSameRankGroups(groupSizesDescending) {
-  const [largestGroup = 0, secondGroup = 0] = groupSizesDescending;
+function worthOfSameRankGroups(groupSizesLargestFirst) {
+  const [largestGroup = 0, secondGroup = 0] = groupSizesLargestFirst;
   if (largestGroup === 4) return POINTS_FOR_QUADS;
   if (largestGroup === 3) return POINTS_FOR_TRIPS + BONUS_TRIPS_CAN_IMPROVE;
   if (largestGroup === 2 && secondGroup === 2) return POINTS_FOR_TWO_PAIR + BONUS_PAIR_CAN_IMPROVE;
@@ -68,7 +74,7 @@ function worthOfSameRankGroups(groupSizesDescending) {
   return 0;
 }
 
-function sameRankGroupSizesDescending(cards) {
+function rankGroupSizesLargestFirst(cards) {
   const countByRank = {};
   for (const card of cards) countByRank[card.rank] = (countByRank[card.rank] || 0) + 1;
   return Object.values(countByRank).sort((a, b) => b - a);

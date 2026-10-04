@@ -3,8 +3,7 @@ import { BOARD_SIZE } from '../../engine/rules';
 import { CardView } from './CardView';
 import { HAND_NAME } from './handNames';
 
-// The grid has one extra row and column, which hold the hand labels.
-const LABEL_TRACK = BOARD_SIZE + 1;
+const HAND_LABEL_TRACK = BOARD_SIZE + 1;
 
 interface BoardProps {
   board: BoardCells;
@@ -15,11 +14,17 @@ interface BoardProps {
   onHover(position: Position | null): void;
 }
 
-function LineLabel({ line, kind, at }: { line: LineScore; kind: 'row' | 'col'; at: number }) {
+interface LineLabelProps {
+  line: LineScore;
+  kind: 'row' | 'col';
+  lineNumber: number;
+}
+
+function LineLabel({ line, kind, lineNumber }: LineLabelProps) {
   const gridPosition =
     kind === 'row'
-      ? { gridRow: at + 1, gridColumn: LABEL_TRACK }
-      : { gridRow: LABEL_TRACK, gridColumn: at + 1 };
+      ? { gridRow: lineNumber + 1, gridColumn: HAND_LABEL_TRACK }
+      : { gridRow: HAND_LABEL_TRACK, gridColumn: lineNumber + 1 };
   return (
     <div
       className={`line-label ${kind}-label ${line.isComplete ? '' : 'partial'}`}
@@ -60,10 +65,10 @@ export function Board({ board, score, hovered, acceptsClicks, onCellClick, onHov
         }),
       )}
       {score.rows.map((line, row) => (
-        <LineLabel key={`row-${row}`} line={line} kind="row" at={row} />
+        <LineLabel key={`row-${row}`} line={line} kind="row" lineNumber={row} />
       ))}
       {score.columns.map((line, column) => (
-        <LineLabel key={`col-${column}`} line={line} kind="col" at={column} />
+        <LineLabel key={`col-${column}`} line={line} kind="col" lineNumber={column} />
       ))}
     </div>
   );

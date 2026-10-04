@@ -1,4 +1,4 @@
-import type { Board, BotView, Card, Cell, HandType, Position, Seed } from '../engine/types';
+import type { Board, BotView, Card, Cell, HandType, Position } from '../engine/types';
 
 export type ForfeitReason = 'exception' | 'invalid_move';
 
@@ -7,7 +7,7 @@ export type BotDecision =
   | { readonly ok: false; readonly reason: ForfeitReason; readonly detail: string };
 
 export interface BotPlayer {
-  chooseMove(view: BotView, randomSeed: Seed): BotDecision;
+  chooseMove(view: BotView): BotDecision;
 }
 
 export interface PresetBot {

@@ -127,14 +127,14 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Context:** All three bots are written against one small contract, `chooseMove(view, helpers)`, typed in `bots/types.ts` with the helpers built in `bots/api.ts`, instead of importing engine internals. That keeps "what a bot may know" in one reviewable place.
 - **Decisions:**
   - `BotView` is plain JSON: cards are `{ rank, suit }`, and the board is `(Card | null)[]`.
-  - Helpers are created **per move** from `seedForMove(gameSeed, moveNumber)`. A bot's decision is then a pure function of (view, seed): it doesn't depend on how many random numbers earlier moves consumed, and paired games give both bots identical random streams at the same position.
+  - **Each bot owns its random number generator.** `createBotPlayer(source, rngSeed)` seeds it once and the bot keeps drawing from it for as long as it lives. The game knows nothing about it: `chooseMove(view)` takes only the view. The tournament seeds each bot from `--seed` and the bot's id, so a run is reproducible; the browser seeds it at random for each game. An earlier version reseeded the helpers on every move from the game's seed and the move number, which made each decision a pure function of the view but tied the bot's randomness to the game's seed and leaked that detail into every caller.
   - Helpers **validate and throw** on misuse (a position off the board, an occupied cell, not 5 cards). A clear error that forfeits the game beats silently returning garbage.
   - `evaluateHand` takes exactly 5 cards: every finished line has 5. Partial-line heuristics are the bot's own business (Greedy computes its own).
 - **Trade-offs:** Per-move helper creation costs one tiny closure per move. Bots that want cross-move randomness can't get it, which is intended.
 
 ### D18. Bots run in-process, through one validation path
 - **Context:** A bot has to be called from the browser game, the tournament CLI and the tests. The rules for what counts as a legal answer must not differ between them.
-- **Decision:** `runner.ts` owns `compileTrustedBotSource` (strict-mode `new Function`, which must define `chooseMove`), `askBotForMove` (call → catch → `acceptOnlyEmptyPosition`), and `describeForMessage` (a readable description for forfeit messages). `createBotPlayer` wraps them as a `BotPlayer`, and every caller uses it. Only a `{ row, column }` of integers naming an empty cell is accepted, with no coercion of strings. A bot that throws or answers anything else **forfeits** that game with reason `exception` or `invalid_move`; it never stalls or crashes the caller.
+- **Decision:** `runner.ts` owns `compileTrustedBotSource` (strict-mode `new Function`, which must define `chooseMove`), `askBotForMove` (call → catch → `validateBotAnswer`), and `describeBotOutput` (a readable description for forfeit messages). `createBotPlayer` wraps them as a `BotPlayer`, and every caller uses it. Only a `{ row, column }` of integers naming an empty cell is accepted, with no coercion of strings. A bot that throws or answers anything else **forfeits** that game with reason `exception` or `invalid_move`; it never stalls or crashes the caller.
 - **The bot gets a copy:** `structuredClone(view)`, so a bot that mutates its view cannot corrupt engine state (tested).
 - **Why in-process, on the main thread:** All three presets are trusted code and take at most about 20 ms per move (D19), roughly one frame, after a 400 ms display delay. A Web Worker would add isolation and the ability to interrupt a bot, but neither is worth its complexity here: message passing, an async interface, and lifecycle management.
 - **Trade-offs:** There is no time limit, because synchronous code can't be interrupted on its own thread. A preset that looped forever would freeze the tab. If untrusted code were ever accepted, it would need a worker in the browser and OS-level isolation on a server.
@@ -178,7 +178,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Options:**
   - Numbers 2–14: the evaluator does plain arithmetic, and display code converts 11–14 to J, Q, K, A.
   - Labels `'2'`…`'9'`, `'T'`, `'J'`, `'Q'`, `'K'`, `'A'`: data reads as cards, and the code that needs order converts a label to its position in `RANKS`.
-- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `fiveDistinctRanksAreConsecutive` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
+- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `isStraight` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
 - **Trade-offs:**
   - Logged and stored cards are readable (`{ rank: 'K', suit: 'H' }`), and the display mappings are gone, apart from showing `'T'` as "10".
   - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11 and D19 were taken before this change.

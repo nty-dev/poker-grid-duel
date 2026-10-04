@@ -1,6 +1,6 @@
-import type { GameRecord } from './match';
+import type { GamePair, GameRecord } from './match';
 
-const Z_FOR_95_PERCENT = 1.959964;
+const Z_FOR_95_PERCENT_CONFIDENCE = 1.959964;
 
 interface Interval {
   readonly low: number;
@@ -22,19 +22,12 @@ const LOSS = 0;
 export function scoreForA(game: GameRecord): number {
   const { result } = game;
   if (result.kind === 'forfeit') return result.by === 'A' ? LOSS : WIN;
-  if (result.score.A === result.score.B) return DRAW;
-  return result.score.A > result.score.B ? WIN : LOSS;
+  if (result.points.A === result.points.B) return DRAW;
+  return result.points.A > result.points.B ? WIN : LOSS;
 }
 
-// The two games of a pair share a deal, so they are not independent. Each
-// pair is treated as one sample: the average of its two scores.
-export function pairScores(games: readonly GameRecord[]): number[] {
-  const scores: number[] = [];
-  for (let first = 0; first + 1 < games.length; first += 2) {
-    const [gameOne, gameTwo] = [games[first], games[first + 1]];
-    if (gameOne && gameTwo) scores.push((scoreForA(gameOne) + scoreForA(gameTwo)) / 2);
-  }
-  return scores;
+export function pairScoresForA(pairs: readonly GamePair[]): number[] {
+  return pairs.map(([gameOne, gameTwo]) => (scoreForA(gameOne) + scoreForA(gameTwo)) / 2);
 }
 
 function mean(values: readonly number[]): number {
@@ -49,11 +42,11 @@ export function sampleStandardDeviation(values: readonly number[]): number | nul
   return Math.sqrt(sumOfSquaredDeviations / degreesOfFreedom);
 }
 
-export function normalApproximationInterval95(samples: readonly number[]): Interval | null {
+export function confidenceInterval95OfMean(samples: readonly number[]): Interval | null {
   const standardDeviation = sampleStandardDeviation(samples);
   if (standardDeviation === null) return null;
   const standardError = standardDeviation / Math.sqrt(samples.length);
-  const halfWidth = Z_FOR_95_PERCENT * standardError;
+  const halfWidth = Z_FOR_95_PERCENT_CONFIDENCE * standardError;
   const average = mean(samples);
   return { low: average - halfWidth, high: average + halfWidth };
 }
@@ -62,9 +55,9 @@ function clampToZeroOne(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
-export function summarizeMatch(games: readonly GameRecord[]): MatchStats {
-  const scores = games.map(scoreForA);
-  const interval = normalApproximationInterval95(pairScores(games));
+export function summarizeMatch(pairs: readonly GamePair[]): MatchStats {
+  const scores = pairs.flat().map(scoreForA);
+  const interval = confidenceInterval95OfMean(pairScoresForA(pairs));
   return {
     wins: scores.filter((score) => score === WIN).length,
     draws: scores.filter((score) => score === DRAW).length,
@@ -79,11 +72,13 @@ export function summarizeMatch(games: readonly GameRecord[]): MatchStats {
 
 const ELO_RATING_SCALE = 400;
 
-// A 0% or 100% score rate would mean an infinite rating gap.
-const LOWEST_USABLE_SCORE_RATE = 0.01;
-const HIGHEST_USABLE_SCORE_RATE = 0.99;
+const MIN_RATEABLE_SCORE_RATE = 0.01;
+const MAX_RATEABLE_SCORE_RATE = 0.99;
 
 export function eloGapFromScoreRate(scoreRate: number): number {
-  const usable = Math.min(HIGHEST_USABLE_SCORE_RATE, Math.max(LOWEST_USABLE_SCORE_RATE, scoreRate));
-  return ELO_RATING_SCALE * Math.log10(usable / (1 - usable));
+  const rateableScoreRate = Math.min(
+    MAX_RATEABLE_SCORE_RATE,
+    Math.max(MIN_RATEABLE_SCORE_RATE, scoreRate),
+  );
+  return ELO_RATING_SCALE * Math.log10(rateableScoreRate / (1 - rateableScoreRate));
 }

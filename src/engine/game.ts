@@ -30,7 +30,8 @@ export function newGame({ seed, firstMover }: GameConfig): GameState {
 }
 
 export function isOnBoard({ row, column }: Position): boolean {
-  const isLineNumber = (n: number) => Number.isInteger(n) && n >= 0 && n < BOARD_SIZE;
+  const isLineNumber = (value: number) =>
+    Number.isInteger(value) && value >= 0 && value < BOARD_SIZE;
   return isLineNumber(row) && isLineNumber(column);
 }
 
@@ -65,9 +66,9 @@ export function currentCard(state: GameState): Card | null {
 }
 
 export function nextCard(state: GameState): Card | null {
-  const isLastTurn = emptyPositions(state.board).length === 1;
-  // The card after the last placement is never revealed.
-  return isLastTurn ? null : (state.deck[countPlacedCards(state) + 1] ?? null);
+  const isLastTurn = emptyPositions(state.board).length <= 1;
+  if (isLastTurn) return null;
+  return state.deck[countPlacedCards(state) + 1] ?? null;
 }
 
 function findMoveError(state: GameState, { seat, position }: Move): GameError | null {

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { createHelpers } from '../src/bots/api';
+import { createBotHelpers } from '../src/bots/api';
 import { askBotForMove, compileTrustedBotSource, createBotPlayer } from '../src/bots/runner';
 import { newGame } from '../src/engine/game';
 import { toBotView } from '../src/engine/botView';
 import { boardFrom, cards, EMPTY_ROWS, parseCard, stateFrom } from './helpers';
 
 describe('bot helpers', () => {
-  const helpers = createHelpers(1);
+  const helpers = createBotHelpers(1);
   const board = boardFrom(['AS 2S . . .', ...EMPTY_ROWS.slice(1)]);
   const nineOfDiamonds = parseCard('9D');
 
@@ -29,22 +29,22 @@ describe('bot helpers', () => {
   });
 
   it('random and shuffle repeat exactly for the same seed', () => {
-    expect(createHelpers(42).random()).toBe(createHelpers(42).random());
+    expect(createBotHelpers(42).random()).toBe(createBotHelpers(42).random());
     const items = [1, 2, 3, 4, 5, 6, 7, 8];
-    const shuffled = createHelpers(7).shuffle(items);
-    expect(createHelpers(7).shuffle(items)).toEqual(shuffled);
+    const shuffled = createBotHelpers(7).shuffle(items);
+    expect(createBotHelpers(7).shuffle(items)).toEqual(shuffled);
     expect([...shuffled].sort()).toEqual(items);
   });
 });
 
 describe('running a bot', () => {
-  // The top-left cell holds the ace; every other cell is empty.
-  const view = toBotView(stateFrom(['AS . . . .', ...EMPTY_ROWS.slice(1)], '2C', '3C'), 'rows');
+  const aceInTopLeft = ['AS . . . .', ...EMPTY_ROWS.slice(1)];
+  const view = toBotView(stateFrom(aceInTopLeft, '2C', '3C'), 'rows');
   const askBotWithBody = (body: string) =>
     askBotForMove(
       compileTrustedBotSource(`function chooseMove(view, helpers) { ${body} }`),
       view,
-      createHelpers(1),
+      createBotHelpers(1),
     );
 
   it('refuses source that does not define chooseMove', () => {
@@ -83,9 +83,10 @@ describe('running a bot', () => {
   it('gives the bot a copy of the view, so the bot cannot change the game', () => {
     const cheat = createBotPlayer(
       'function chooseMove(view) { view.board[0][3] = view.currentCard; return { row: 0, column: 4 }; }',
+      1,
     );
     const realView = toBotView(newGame({ seed: 1, firstMover: 'rows' }), 'rows');
-    expect(cheat.chooseMove(realView, 1)).toEqual({ ok: true, position: { row: 0, column: 4 } });
+    expect(cheat.chooseMove(realView)).toEqual({ ok: true, position: { row: 0, column: 4 } });
     expect(realView.board[0]?.[3]).toBeNull();
   });
 });

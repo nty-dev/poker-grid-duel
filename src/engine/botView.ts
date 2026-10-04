@@ -1,4 +1,4 @@
-import { countPlacedCards, currentCard, nextCard } from './game';
+import { currentCard, nextCard } from './game';
 import type { GameState, BotView, Seat } from './types';
 
 export function toBotView(state: GameState, mySeat: Seat): BotView {
@@ -11,6 +11,5 @@ export function toBotView(state: GameState, mySeat: Seat): BotView {
     mySeat,
     currentCard: current,
     nextCard: nextCard(state),
-    moveNumber: countPlacedCards(state),
   };
 }

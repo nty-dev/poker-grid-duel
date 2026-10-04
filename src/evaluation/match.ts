@@ -1,4 +1,3 @@
-import { seedForMove } from '../bots/runner';
 import type { BotPlayer, ForfeitReason } from '../bots/types';
 import { isGameOver, newGame, otherSeat, step } from '../engine/game';
 import { scoreBoard } from '../engine/scoring';
@@ -8,7 +7,7 @@ import { toBotView } from '../engine/botView';
 type Side = 'A' | 'B';
 
 export type GameResult =
-  | { readonly kind: 'finished'; readonly score: Readonly<Record<Side, number>> }
+  | { readonly kind: 'finished'; readonly points: Readonly<Record<Side, number>> }
   | {
       readonly kind: 'forfeit';
       readonly by: Side;
@@ -23,23 +22,14 @@ export interface GameRecord {
 }
 
 interface MatchOptions {
-  readonly pairs: number;
+  readonly pairCount: number;
   readonly baseSeed: number;
 }
 
-// Both games of a pair use one seed, so both bots play the same deal: once
-// with A scoring rows, once with A scoring columns. The seat that moves first
-// stays the same, so the bot that moved first in one game moves second in the
-// other. That seat alternates between pairs.
-function gamesOfPair(pairNumber: number, baseSeed: number): [GameConfig, Seat][] {
-  const config: GameConfig = {
-    seed: baseSeed + pairNumber,
-    firstMover: pairNumber % 2 === 0 ? 'rows' : 'columns',
-  };
-  return [
-    [config, 'rows'],
-    [config, 'columns'],
-  ];
+export type GamePair = readonly [GameRecord, GameRecord];
+
+function dealForPair(pairNumber: number, baseSeed: number): GameConfig {
+  return { seed: baseSeed + pairNumber, firstMover: pairNumber % 2 === 0 ? 'rows' : 'columns' };
 }
 
 export function playGame(
@@ -51,8 +41,7 @@ export function playGame(
   while (!isGameOver(state)) {
     const seat = state.toMove;
     const side: Side = seat === seatOfA ? 'A' : 'B';
-    const view = toBotView(state, seat);
-    const decision = players[side].chooseMove(view, seedForMove(config.seed, view.moveNumber));
+    const decision = players[side].chooseMove(toBotView(state, seat));
     if (!decision.ok) {
       const { reason, detail } = decision;
       return { config, seatOfA, result: { kind: 'forfeit', by: side, reason, detail } };
@@ -68,20 +57,18 @@ export function playGame(
     state = stepped.state;
   }
   const { total } = scoreBoard(state.board);
-  const score = { A: total[seatOfA], B: total[otherSeat(seatOfA)] };
-  return { config, seatOfA, result: { kind: 'finished', score } };
+  const points = { A: total[seatOfA], B: total[otherSeat(seatOfA)] };
+  return { config, seatOfA, result: { kind: 'finished', points } };
 }
 
-// Returns the games in order, so games 2k and 2k + 1 are always one pair.
 export function runMatch(
   players: Readonly<Record<Side, BotPlayer>>,
-  { pairs, baseSeed }: MatchOptions,
-): GameRecord[] {
-  const games: GameRecord[] = [];
-  for (let pairNumber = 0; pairNumber < pairs; pairNumber++) {
-    for (const [config, seatOfA] of gamesOfPair(pairNumber, baseSeed)) {
-      games.push(playGame(players, config, seatOfA));
-    }
+  { pairCount, baseSeed }: MatchOptions,
+): GamePair[] {
+  const gamePairs: GamePair[] = [];
+  for (let pairNumber = 0; pairNumber < pairCount; pairNumber++) {
+    const deal = dealForPair(pairNumber, baseSeed);
+    gamePairs.push([playGame(players, deal, 'rows'), playGame(players, deal, 'columns')]);
   }
-  return games;
+  return gamePairs;
 }

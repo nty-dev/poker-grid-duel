@@ -45,7 +45,7 @@ function LineScores({
   );
 }
 
-function winningSeatOrNullForDraw(end: GameEnd): Seat | null {
+function winningSeat(end: GameEnd): Seat | null {
   if (end.kind === 'forfeit') return otherSeat(end.seat);
   const result = outcome(end.score.total);
   return result.kind === 'draw' ? null : result.winner;
@@ -57,7 +57,7 @@ function headlineFor(winnerName: string | null): string {
 }
 
 export function GameOver({ end, score, seats, children }: GameOverProps) {
-  const winner = winningSeatOrNullForDraw(end);
+  const winner = winningSeat(end);
   return (
     <div className="panel game-over">
       <h2>{headlineFor(winner && seats[winner].name)}</h2>

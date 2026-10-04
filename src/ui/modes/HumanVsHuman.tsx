@@ -10,37 +10,38 @@ interface Setup {
   readonly playerOneMovesFirst: boolean;
 }
 
-interface Match {
-  readonly id: number;
+interface StartedGame {
+  readonly gameNumber: number;
   readonly config: GameConfig;
   readonly seats: Seats;
 }
 
-function newMatch({ playerOneSeat, playerOneMovesFirst }: Setup, id: number): Match {
+function startGame({ playerOneSeat, playerOneMovesFirst }: Setup, gameNumber: number): StartedGame {
   const seats = assignSeats(
     playerOneSeat,
     { kind: 'human', name: 'Player 1' },
     { kind: 'human', name: 'Player 2' },
   );
   const firstMover = playerOneMovesFirst ? playerOneSeat : otherSeat(playerOneSeat);
-  return { id, seats, config: { seed: randomGameSeed(), firstMover } };
+  return { gameNumber, seats, config: { seed: randomGameSeed(), firstMover } };
 }
 
 export function HumanVsHuman() {
   const [setup, setSetup] = useState<Setup>({ playerOneSeat: 'rows', playerOneMovesFirst: true });
-  const [match, setMatch] = useState<Match | null>(null);
+  const [startedGame, setStartedGame] = useState<StartedGame | null>(null);
 
-  if (match) {
+  if (startedGame) {
     return (
       <GameView
-        // A new key discards the old game's state, so each match starts clean.
-        key={match.id}
-        config={match.config}
-        seats={match.seats}
+        key={startedGame.gameNumber}
+        config={startedGame.config}
+        seats={startedGame.seats}
         endActions={
           <>
-            <button onClick={() => setMatch(newMatch(setup, match.id + 1))}>Play again</button>
-            <button className="secondary" onClick={() => setMatch(null)}>
+            <button onClick={() => setStartedGame(startGame(setup, startedGame.gameNumber + 1))}>
+              Play again
+            </button>
+            <button className="secondary" onClick={() => setStartedGame(null)}>
               Change setup
             </button>
           </>
@@ -82,7 +83,7 @@ export function HumanVsHuman() {
           ))}
         </fieldset>
         <div className="actions">
-          <button onClick={() => setMatch(newMatch(setup, 1))}>Start</button>
+          <button onClick={() => setStartedGame(startGame(setup, 1))}>Start</button>
         </div>
       </section>
     </main>

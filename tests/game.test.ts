@@ -120,13 +120,12 @@ describe('a whole game', () => {
 describe('toBotView', () => {
   const state = newGame({ seed: 10, firstMover: 'rows' });
 
-  it('shows the board, the current and next cards, the seat and the move number', () => {
+  it('shows the board, the current and next cards, and the seat', () => {
     expect(toBotView(state, 'columns')).toEqual({
       board: state.board,
       mySeat: 'columns',
       currentCard: state.deck[0],
       nextCard: state.deck[1],
-      moveNumber: 0,
     });
   });
 

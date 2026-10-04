@@ -2,8 +2,8 @@
 
 Each bot is one file in this folder that defines `chooseMove(view, helpers)`. It is called when it is the bot's turn and must return the position of an empty cell, `{ row, column }`.
 
-- `view` is what the bot can see: `board`, `mySeat` (`'rows'` or `'columns'`), `currentCard` (the card it must place now), `nextCard` (the card after it) and `moveNumber`.
-- `helpers` are functions the bot may call: `emptyPositions`, `lineOf`, `evaluateHand`, `place`, `random` and `shuffle`. The last two are seeded, so the same game always plays out the same way.
+- `view` is what the bot can see: `board`, `mySeat` (`'rows'` or `'columns'`), `currentCard` (the card it must place now), and `nextCard` (the card after it).
+- `helpers` are functions the bot may call: `emptyPositions`, `lineOf`, `evaluateHand`, `place`, `random` and `shuffle`. The last two draw from the bot's own random number generator, which is seeded when the bot is created, so a tournament run with the same seed always plays the same games.
 
 The files contain no comments. This page is the explanation; the function names in each file follow the steps below.
 
@@ -27,7 +27,7 @@ Greedy looks only at the card in hand. It does not use `nextCard`.
 advantage = (gain in worth of my line) − (gain in worth of the opponent's line)
 ```
 
-and play the position with the largest advantage (`chooseMove`, `worthGained`). The subtraction is what makes Greedy block: a card that completes the opponent's hand has a large negative advantage, so Greedy puts it somewhere else if it can.
+and play the position with the largest advantage (`chooseMove`, `lineWorthGained`). The subtraction is what makes Greedy block: a card that completes the opponent's hand has a large negative advantage, so Greedy puts it somewhere else if it can.
 
 **The worth of a line** (`lineWorth`).
 
@@ -62,7 +62,7 @@ Monte Carlo cannot calculate the best move, because it does not know the order o
 3. **For every empty position (a candidate)**, and for each of the 100 futures (`boardAfterRandomFinish`):
    - place the current card on the candidate;
    - deal the future's cards, one by one, into the remaining empty cells in the future's fill order.
-4. **Score the full board** (`myLeadOnFullBoard`): my total minus the opponent's total.
+4. **Score the full board** (`myScoreLead`): my total minus the opponent's total.
 5. **Play the candidate whose lead, added up over the 100 futures, is largest.**
 
 **Why every candidate is tested on the same 100 futures.** If each candidate drew its own random futures, one could look better only because it happened to draw luckier cards. Using the same futures for all of them means the only difference between two candidates is the move itself. This is the "common random numbers" technique.

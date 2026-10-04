@@ -71,7 +71,6 @@ export interface BotView {
   readonly mySeat: Seat;
   readonly currentCard: Card;
   readonly nextCard: Card | null;
-  readonly moveNumber: number;
 }
 
 export type Seed = number | string;
