@@ -2,11 +2,7 @@ export type Mode = 'humanVsHuman' | 'humanVsBot';
 
 const MODES: readonly { id: Mode; title: string; summary: string }[] = [
   { id: 'humanVsHuman', title: 'Human vs Human', summary: 'Pass-and-play on this device.' },
-  {
-    id: 'humanVsBot',
-    title: 'Human vs Bot',
-    summary: 'Play a preset bot. Your Elo rating updates.',
-  },
+  { id: 'humanVsBot', title: 'Human vs Bot', summary: 'Play Random, Greedy or Monte Carlo.' },
 ];
 
 export function ModeSelect({ onSelect }: { onSelect(mode: Mode): void }) {

@@ -30,16 +30,8 @@ export type GameEnd =
       readonly detail: string;
     };
 
-const MESSAGE_FOR_ERROR: Record<GameError, string> = {
-  gameOver: 'The game is over.',
-  notYourTurn: 'Wait for your turn.',
-  notOnBoard: 'That is not a cell on the board.',
-  cellOccupied: 'That cell is already taken.',
-};
-
 export function useGame(config: GameConfig, seats: Seats) {
   const [state, setState] = useState(() => newGame(config));
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [end, setEnd] = useState<GameEnd | null>(null);
 
   const placeCurrentCard = useCallback(
@@ -79,10 +71,8 @@ export function useGame(config: GameConfig, seats: Seats) {
   }, [state, isInProgress, participantToMove, config.seed, placeCurrentCard]);
 
   const placeAsHuman = (position: Position) => {
-    if (!isHumanTurn) return;
-    const engineError = placeCurrentCard(position);
-    setErrorMessage(engineError ? MESSAGE_FOR_ERROR[engineError] : null);
+    if (isHumanTurn) placeCurrentCard(position);
   };
 
-  return { state, end, errorMessage, placeAsHuman, isHumanTurn };
+  return { state, end, placeAsHuman, isHumanTurn };
 }

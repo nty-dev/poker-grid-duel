@@ -154,7 +154,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Context:** Card luck dominates a single game. Comparing two bots on independent deals needs many games to see a real difference.
 - **Decision:** A match is N/2 **pairs**. Both games of a pair use the same seed (the same deal). In game 1 bot A scores rows; in game 2 it scores columns. The first-moving *seat* is the same in both games, so the bot that moved first in game 1 moves second in game 2. Across the pair, each bot faces exactly the cards and turn order the other faced. The first-moving seat alternates between pairs, so rows and columns both start half the time.
 - **Why it works:** This is variance reduction by common random numbers, as in backtesting two strategies on the same price path. The luck of the deal appears in both games with opposite sign and largely cancels in the pair average. What's left is mostly skill.
-- **Records:** A game is stored as `(config, aSeat, moves[])` with moves as positions; seats alternate from `firstMover`. A test replays every record through the engine and checks the recorded score.
+- **Records:** A game is stored as `(config, seatOfA, result)`: the deal, which bot sat where, and the score or the forfeit.
 
 ### D23. Confidence interval: normal approximation over pairs
 - **Context:** A match reports a win rate (score per game: win 1, draw ½, loss 0) with a 95% CI. "Bot A is better than bot B" means the whole interval lies above 50%.

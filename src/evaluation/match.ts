@@ -2,7 +2,7 @@ import { seedForMove } from '../bots/runner';
 import type { BotPlayer, ForfeitReason } from '../bots/types';
 import { isGameOver, newGame, otherSeat, step } from '../engine/game';
 import { scoreBoard } from '../engine/scoring';
-import type { GameConfig, Position, Seat } from '../engine/types';
+import type { GameConfig, Seat } from '../engine/types';
 import { toBotView } from '../engine/botView';
 
 type Side = 'A' | 'B';
@@ -19,7 +19,6 @@ export type GameResult =
 export interface GameRecord {
   readonly config: GameConfig;
   readonly seatOfA: Seat;
-  readonly positionsInPlayOrder: readonly Position[];
   readonly result: GameResult;
 }
 
@@ -49,7 +48,6 @@ export function playGame(
   seatOfA: Seat,
 ): GameRecord {
   let state = newGame(config);
-  const positionsInPlayOrder: Position[] = [];
   while (!isGameOver(state)) {
     const seat = state.toMove;
     const side: Side = seat === seatOfA ? 'A' : 'B';
@@ -57,12 +55,7 @@ export function playGame(
     const decision = players[side].chooseMove(view, seedForMove(config.seed, view.moveNumber));
     if (!decision.ok) {
       const { reason, detail } = decision;
-      return {
-        config,
-        seatOfA,
-        positionsInPlayOrder,
-        result: { kind: 'forfeit', by: side, reason, detail },
-      };
+      return { config, seatOfA, result: { kind: 'forfeit', by: side, reason, detail } };
     }
     const stepped = step(state, { seat, position: decision.position });
     if (!stepped.ok) {
@@ -72,12 +65,11 @@ export function playGame(
           'runner had accepted it. The two checks should always agree.',
       );
     }
-    positionsInPlayOrder.push(decision.position);
     state = stepped.state;
   }
   const { total } = scoreBoard(state.board);
   const score = { A: total[seatOfA], B: total[otherSeat(seatOfA)] };
-  return { config, seatOfA, positionsInPlayOrder, result: { kind: 'finished', score } };
+  return { config, seatOfA, result: { kind: 'finished', score } };
 }
 
 // Returns the games in order, so games 2k and 2k + 1 are always one pair.

@@ -13,7 +13,7 @@ interface GameViewProps {
 }
 
 export function GameView({ config, seats, endActions }: GameViewProps) {
-  const { state, end, errorMessage, placeAsHuman, isHumanTurn } = useGame(config, seats);
+  const { state, end, placeAsHuman, isHumanTurn } = useGame(config, seats);
   const [hovered, setHovered] = useState<Position | null>(null);
   const score = scoreBoard(state.board);
   const hoveredOnHumanTurn = isHumanTurn ? hovered : null;
@@ -42,13 +42,7 @@ export function GameView({ config, seats, endActions }: GameViewProps) {
           {endActions}
         </GameOver>
       ) : (
-        <Sidebar
-          state={state}
-          score={score}
-          seats={seats}
-          hovered={hoveredOnHumanTurn}
-          errorMessage={errorMessage}
-        />
+        <Sidebar state={state} score={score} seats={seats} hovered={hoveredOnHumanTurn} />
       )}
     </div>
   );

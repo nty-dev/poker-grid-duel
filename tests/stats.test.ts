@@ -12,7 +12,6 @@ import {
 const gameWith = (result: GameResult): GameRecord => ({
   config: { seed: 1, firstMover: 'rows' },
   seatOfA: 'rows',
-  positionsInPlayOrder: [],
   result,
 });
 const win = gameWith({ kind: 'finished', score: { A: 10, B: 4 } });

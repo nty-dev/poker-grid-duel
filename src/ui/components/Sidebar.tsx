@@ -10,7 +10,6 @@ interface SidebarProps {
   score: BoardScore;
   seats: Seats;
   hovered: Position | null;
-  errorMessage: string | null;
 }
 
 interface PreviewLineProps {
@@ -72,7 +71,7 @@ function PlacementPreview({ state, seats, position }: PlacementPreviewProps) {
   );
 }
 
-export function Sidebar({ state, score, seats, hovered, errorMessage }: SidebarProps) {
+export function Sidebar({ state, score, seats, hovered }: SidebarProps) {
   const seatToMove = state.toMove;
   const participantToMove = seats[seatToMove];
   const turnText =
@@ -108,7 +107,6 @@ export function Sidebar({ state, score, seats, hovered, errorMessage }: SidebarP
         </div>
       </div>
 
-      {errorMessage && <div className="panel error">{errorMessage}</div>}
       {hovered && <PlacementPreview state={state} seats={seats} position={hovered} />}
     </aside>
   );
