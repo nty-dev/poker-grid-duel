@@ -8,13 +8,11 @@ interface Interval {
 }
 
 interface MatchStats {
-  readonly games: number;
   readonly wins: number;
   readonly draws: number;
   readonly losses: number;
   readonly scoreRate: number;
   readonly scoreRateInterval: Interval | null;
-  readonly averageScoreDifference: number | null;
 }
 
 const WIN = 1;
@@ -67,11 +65,7 @@ function clampToZeroOne(value: number): number {
 export function summarizeMatch(games: readonly GameRecord[]): MatchStats {
   const scores = games.map(scoreForA);
   const interval = normalApproximationInterval95(pairScores(games));
-  const scoreDifferences = games.flatMap(({ result }) =>
-    result.kind === 'finished' ? [result.score.A - result.score.B] : [],
-  );
   return {
-    games: games.length,
     wins: scores.filter((score) => score === WIN).length,
     draws: scores.filter((score) => score === DRAW).length,
     losses: scores.filter((score) => score === LOSS).length,
@@ -80,7 +74,6 @@ export function summarizeMatch(games: readonly GameRecord[]): MatchStats {
       low: clampToZeroOne(interval.low),
       high: clampToZeroOne(interval.high),
     },
-    averageScoreDifference: scoreDifferences.length ? mean(scoreDifferences) : null,
   };
 }
 

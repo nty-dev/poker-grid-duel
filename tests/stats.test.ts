@@ -49,11 +49,10 @@ describe('the 95% interval', () => {
 });
 
 describe('summarizeMatch', () => {
-  it('counts wins, draws and losses, and averages the score difference of finished games', () => {
+  it('counts wins, draws and losses, and averages them into a score rate', () => {
     const stats = summarizeMatch([win, loss, draw, forfeitByA, forfeitByB, win]);
-    expect(stats).toMatchObject({ games: 6, wins: 3, draws: 1, losses: 2 });
+    expect(stats).toMatchObject({ wins: 3, draws: 1, losses: 2 });
     expect(stats.scoreRate).toBeCloseTo(3.5 / 6, 10);
-    expect(stats.averageScoreDifference).toBeCloseTo((6 - 5 + 0 + 6) / 4, 10);
   });
 
   it('builds the interval from pairs: when every pair splits 1–1 there is no uncertainty', () => {

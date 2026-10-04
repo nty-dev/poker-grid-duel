@@ -13,8 +13,6 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "sim": "tsx src/sim/tournament.ts",
-    "bench": "tsx src/sim/bench.ts",
-    "playouts": "tsx src/sim/playouts.ts",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {

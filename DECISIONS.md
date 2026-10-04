@@ -87,7 +87,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 
 ### D11. Monte Carlo cost per move
 - **Cost:** about `emptyPositions × N × remainingPlacements` placements, plus one board score per playout. At the opening that is 25 × N × 24.
-- **Measured** (`npm run bench`, Node, laptop), for the v2 preset using only the public helpers at 100 playouts: 13 ms at the opening, 6 ms mid-game, about 18 ms per move over whole games (`npm run sim`). Strength against playout count is measured in BALANCE.md.
+- **Measured** (Node, laptop, with timing scripts since removed), for the v2 preset using only the public helpers at 100 playouts: 13 ms at the opening, 6 ms mid-game, about 18 ms per move over whole games.
 
 ## Rating
 
@@ -168,7 +168,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
   - Pair scores aren't Bernoulli, so Wilson doesn't apply to them directly.
   - With 50–100 bounded samples, the CLT makes the normal approximation reasonable.
 - **Trade-offs:** The normal approximation is poor for very small matches or rates near 0/1. A sweep of wins gives a zero-width interval; the conclusion it supports (clearly better) is still correct. Draws count as ½, consistent with Elo.
-- **How many games:** The measured pair-score standard deviation is σ ≈ 0.26 (Greedy vs Monte Carlo, BALANCE.md Finding 2). With 100 pairs (200 games) the CI half-width is about 1.96 · 0.26 / √100 ≈ ±5%, so a true win rate of roughly 55% or more is distinguishable from 50%. Halving the width needs four times the games.
+- **How many games:** The measured pair-score standard deviation is σ ≈ 0.26 (Greedy vs Monte Carlo). With 100 pairs (200 games) the CI half-width is about 1.96 · 0.26 / √100 ≈ ±5%, so a true win rate of roughly 55% or more is distinguishable from 50%. Halving the width needs four times the games.
 - **Caveat:** A match is one look at a fixed sample size. Rerunning a comparison until it passes, or tweaking a bot and retesting on the same seeds, is multiple testing and overfits to those deals. A final comparison should use fresh seeds.
 
 *D24 (Arena UI), D25 (Hall of Fame and performance ratings), D26 (BotRepository) and D27 (repeated promotion attempts) were removed with the Arena in v3. D27's multiple-testing point lives on as the caveat in D23.*
@@ -181,7 +181,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `fiveDistinctRanksAreConsecutive` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
 - **Trade-offs:**
   - Logged and stored cards are readable (`{ rank: 'K', suit: 'H' }`), and the display mappings are gone, apart from showing `'T'` as "10".
-  - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11, D19 and BALANCE.md were taken before this change.
+  - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11 and D19 were taken before this change.
   - Behaviour is unchanged: the same seeds produce exactly the same tournament results before and after.
 
 ### D29. Where definitions live

@@ -1,15 +1,14 @@
 interface TournamentArgs {
   games: number;
   seed: number;
-  bots: string[];
 }
 
 type ParsedArgs = { ok: true; value: TournamentArgs } | { ok: false; error: string };
 
-const KNOWN_FLAGS = ['games', 'seed', 'bots'];
+const KNOWN_FLAGS = ['games', 'seed'];
 const FLAG_PATTERN = /^--([a-z]+)=(.*)$/;
 
-export function parseArgs(argv: readonly string[], knownBots: readonly string[]): ParsedArgs {
+export function parseArgs(argv: readonly string[]): ParsedArgs {
   const flagValues = new Map<string, string>();
   for (const argument of argv) {
     const match = FLAG_PATTERN.exec(argument);
@@ -26,12 +25,5 @@ export function parseArgs(argv: readonly string[], knownBots: readonly string[])
   const seed = Number(flagValues.get('seed') ?? 1);
   if (!Number.isInteger(seed)) return { ok: false, error: '--seed must be an integer' };
 
-  const bots = flagValues.get('bots')?.split(',') ?? [...knownBots];
-  const unknownBot = bots.find((bot) => !knownBots.includes(bot));
-  if (unknownBot !== undefined) {
-    return { ok: false, error: `Unknown bot "${unknownBot}". Known: ${knownBots.join(', ')}` };
-  }
-  if (bots.length < 2) return { ok: false, error: '--bots needs at least two bots' };
-
-  return { ok: true, value: { games, seed, bots } };
+  return { ok: true, value: { games, seed } };
 }

@@ -1,7 +1,0 @@
-{"playouts":5,"games":200,"scoreRate":0.4675,"ci95":[0.405,0.53],"eloOverGreedy":-23,"msPerMove":0.49}
-{"playouts":10,"games":200,"scoreRate":0.5675,"ci95":[0.5072,0.6278],"eloOverGreedy":47,"msPerMove":2.02}
-{"playouts":25,"games":200,"scoreRate":0.615,"ci95":[0.5518,0.6782],"eloOverGreedy":81,"msPerMove":4.47}
-{"playouts":50,"games":200,"scoreRate":0.7625,"ci95":[0.7107,0.8143],"eloOverGreedy":203,"msPerMove":9.29}
-{"playouts":100,"games":200,"scoreRate":0.7775,"ci95":[0.7259,0.8291],"eloOverGreedy":217,"msPerMove":18.03}
-{"playouts":200,"games":200,"scoreRate":0.7975,"ci95":[0.7479,0.8471],"eloOverGreedy":238,"msPerMove":36.2}
-{"playouts":400,"games":200,"scoreRate":0.835,"ci95":[0.7887,0.8813],"eloOverGreedy":282,"msPerMove":71.78}

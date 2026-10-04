@@ -40,12 +40,10 @@ npm install
 npm run dev        # play in the browser
 npm run check      # typecheck + lint + tests
 npm run build      # production build into dist/
-npm run bench      # time one Monte Carlo decision
-npm run sim -- --games=200 --seed=1 --bots=random,greedy,montecarlo
-npm run playouts   # Monte Carlo strength vs playout count, against Greedy
+npm run sim -- --games=200 --seed=1    # rate the bots
 ```
 
-`npm run sim` plays every pair of bots and prints JSON: W/D/L, win rate with its 95% CI, average score difference, first-mover score, milliseconds per move, and calibrated ratings, with the first bot anchored at 800. Raw runs are in [`results/`](results/) and the findings are in [BALANCE.md](BALANCE.md).
+`npm run sim` plays each bot against the one listed before it and prints JSON: W/D/L, win rate with its 95% CI, the Elo gap, and the calibrated ratings, with the first bot anchored at 800. These are the ratings shown in the opponent picker. The run behind the current ratings is in [BALANCE.md](BALANCE.md), with the raw output in [`results/`](results/).
 
 ## How the bots work
 
@@ -88,7 +86,7 @@ flowchart LR
   match -- step --> game
   match --> runner
   ui[src/ui: React<br/>Human vs Human, Human vs Bot] --> game & runner
-  sim[src/sim<br/>tournament + playouts CLIs] --> match & stats
+  sim[src/sim<br/>rating tournament CLI] --> match & stats
 ```
 
 - **Pure engine.** `step(state, move)` returns `{ ok: true, state }` or `{ ok: false, error }`: it never throws on bad input and never mutates. A game is fully defined by `(seed, firstMover, moves[])`, and tests replay games to check it. No `Math.random` or clocks in `engine`, `bots` or `evaluation`; ESLint enforces this.
@@ -104,7 +102,7 @@ Every significant choice, with the alternatives considered, is in **[DECISIONS.m
 src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, game, botView
 src/bots        types (bot contract), api (helpers), runner, presets/ (3 bots + catalog)
 src/evaluation  match runner, stats (confidence interval, Elo gap)
-src/sim         tournament CLI, playouts experiment, benchmark, arg parsing, move timer
+src/sim         rating tournament CLI, arg parsing
 src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, useGame
 tests           Vitest: engine, evaluator, scoring, bot API, presets, match,
                 stats, CLI args
