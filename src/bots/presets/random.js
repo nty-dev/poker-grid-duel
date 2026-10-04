@@ -1,6 +1,5 @@
-/* exported chooseMove */
-
 function chooseMove(view, helpers) {
   const emptyPositions = helpers.emptyPositions(view.board);
-  return emptyPositions[Math.floor(helpers.random() * emptyPositions.length)];
+  const randomIndex = Math.floor(helpers.random() * emptyPositions.length);
+  return emptyPositions[randomIndex];
 }

@@ -1,9 +1,3 @@
-/* exported chooseMove */
-// Monte Carlo cannot see the order of the deck, so it samples it. For every
-// empty position it places the current card there, finishes the game at random
-// PLAYOUTS times, and keeps the position with the best total of
-// (my final score − opponent's final score).
-
 const PLAYOUTS = 100;
 const BOARD_SIZE = 5;
 const SUITS = 'SHDC';
@@ -14,61 +8,67 @@ for (let row = 0; row < BOARD_SIZE; row++) {
   for (let column = 0; column < BOARD_SIZE; column++) ALL_POSITIONS.push({ row, column });
 }
 
-function cardsNotYetSeen(view) {
-  const seenCards = view.board.flat().concat(view.currentCard, view.nextCard);
-  const seenLabels = new Set(seenCards.map((card) => card && card.rank + card.suit));
-  const cards = [];
-  for (const suit of SUITS) {
-    for (const rank of RANKS) {
-      if (!seenLabels.has(rank + suit)) cards.push({ rank, suit });
-    }
-  }
-  return cards;
-}
-
 function chooseMove(view, helpers) {
-  const unseenCards = cardsNotYetSeen(view);
-  // Every candidate position is judged on the same sampled futures. Otherwise
-  // one could look better only because it happened to draw luckier cards.
-  const sampledFutures = [];
-  for (let playout = 0; playout < PLAYOUTS; playout++) {
-    const shuffledUnseen = helpers.shuffle(unseenCards);
-    sampledFutures.push({
-      cardsToCome: view.nextCard ? [view.nextCard].concat(shuffledUnseen) : shuffledUnseen,
-      fillOrder: helpers.shuffle(ALL_POSITIONS),
-    });
-  }
+  const futuresSharedByAllCandidates = sampleFutures(view, helpers);
 
   let bestPosition = null;
   let bestTotalLead = -Infinity;
-  for (const position of helpers.emptyPositions(view.board)) {
+  for (const candidate of helpers.emptyPositions(view.board)) {
     let totalLead = 0;
-    for (const future of sampledFutures) {
-      totalLead += myLeadAfterRandomFinish(view, position, future, helpers);
+    for (const future of futuresSharedByAllCandidates) {
+      const finalBoard = boardAfterRandomFinish(view, candidate, future);
+      totalLead += myLeadOnFullBoard(finalBoard, view.mySeat, helpers);
     }
     if (totalLead > bestTotalLead) {
-      bestPosition = position;
+      bestPosition = candidate;
       bestTotalLead = totalLead;
     }
   }
   return bestPosition;
 }
 
-// When both sides play at random, it does not matter who places which card:
-// the cards to come simply land on the empty positions in a random order.
-function myLeadAfterRandomFinish(view, candidate, future, helpers) {
+function sampleFutures(view, helpers) {
+  const unseenCards = cardsNotYetSeen(view);
+  const futures = [];
+  for (let playout = 0; playout < PLAYOUTS; playout++) {
+    const guessedDeckOrder = helpers.shuffle(unseenCards);
+    futures.push({
+      cardsInDealOrder: view.nextCard ? [view.nextCard].concat(guessedDeckOrder) : guessedDeckOrder,
+      positionsInFillOrder: helpers.shuffle(ALL_POSITIONS),
+    });
+  }
+  return futures;
+}
+
+function cardsNotYetSeen(view) {
+  const seenCards = view.board.flat().concat(view.currentCard, view.nextCard);
+  const seenLabels = new Set(seenCards.map((card) => card && card.rank + card.suit));
+  const unseenCards = [];
+  for (const suit of SUITS) {
+    for (const rank of RANKS) {
+      if (!seenLabels.has(rank + suit)) unseenCards.push({ rank, suit });
+    }
+  }
+  return unseenCards;
+}
+
+function boardAfterRandomFinish(view, candidate, future) {
   const board = view.board.map((cellsInRow) => cellsInRow.slice());
   board[candidate.row][candidate.column] = view.currentCard;
-  let cardsDrawn = 0;
-  for (const { row, column } of future.fillOrder) {
-    if (board[row][column] === null) board[row][column] = future.cardsToCome[cardsDrawn++];
+  let cardsDealt = 0;
+  for (const { row, column } of future.positionsInFillOrder) {
+    const isEmpty = board[row][column] === null;
+    if (isEmpty) board[row][column] = future.cardsInDealOrder[cardsDealt++];
   }
+  return board;
+}
 
+function myLeadOnFullBoard(board, mySeat, helpers) {
   let rowsScore = 0;
   let columnsScore = 0;
   for (let lineNumber = 0; lineNumber < BOARD_SIZE; lineNumber++) {
     rowsScore += helpers.evaluateHand(helpers.lineOf(board, 'row', lineNumber)).points;
     columnsScore += helpers.evaluateHand(helpers.lineOf(board, 'column', lineNumber)).points;
   }
-  return view.mySeat === 'rows' ? rowsScore - columnsScore : columnsScore - rowsScore;
+  return mySeat === 'rows' ? rowsScore - columnsScore : columnsScore - rowsScore;
 }

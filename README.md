@@ -65,7 +65,7 @@ function chooseMove(view, helpers) {
 | Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1354 |
 | Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1576 |
 
-The source is in [`src/bots/presets/`](src/bots/presets/). The ratings come from the tournament (BALANCE.md).
+The source is in [`src/bots/presets/`](src/bots/presets/), and [its README](src/bots/presets/README.md) explains each algorithm step by step. The ratings come from the tournament (BALANCE.md).
 
 ## Architecture
 

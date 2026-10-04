@@ -33,7 +33,11 @@ export default tseslint.config(
     extends: [js.configs.recommended],
     files: ['src/bots/**/*.js'],
     languageOptions: { sourceType: 'script', globals: {} },
-    rules: determinism,
+    rules: {
+      ...determinism,
+      // chooseMove is the bot's entry point: the runner reads it, nothing in the file calls it.
+      'no-unused-vars': ['error', { varsIgnorePattern: '^chooseMove$' }],
+    },
   },
   {
     // Deterministic code: no ambient randomness or clocks.
