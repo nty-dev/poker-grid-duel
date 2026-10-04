@@ -1,9 +1,6 @@
-import type { PresetBot } from '../types';
+import type { PresetBot, PresetId } from '../types';
 
-export const PRESET_IDS = ['random', 'greedy', 'montecarlo'] as const;
-export type PresetId = (typeof PRESET_IDS)[number];
-
-type PresetInfo = Omit<PresetBot, 'source'> & { readonly id: PresetId };
+type PresetInfo = Omit<PresetBot, 'source'>;
 
 const PRESET_INFO: readonly PresetInfo[] = [
   {

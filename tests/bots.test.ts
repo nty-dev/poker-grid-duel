@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PRESET_IDS, type PresetId } from '../src/bots/presets/catalog';
+import { PRESET_IDS, type PresetId } from '../src/bots/types';
 import { createBotPlayer } from '../src/bots/runner';
 import { runMatch } from '../src/evaluation/match';
 import { summarizeMatch } from '../src/evaluation/stats';

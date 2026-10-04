@@ -10,8 +10,11 @@ export interface BotPlayer {
   chooseMove(view: BotView): BotDecision;
 }
 
+export const PRESET_IDS = ['random', 'greedy', 'montecarlo'] as const;
+export type PresetId = (typeof PRESET_IDS)[number];
+
 export interface PresetBot {
-  readonly id: string;
+  readonly id: PresetId;
   readonly name: string;
   readonly description: string;
   readonly source: string;

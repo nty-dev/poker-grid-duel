@@ -12,9 +12,9 @@ export function CardView({
   if (!card) return <div className={`card card-${size} card-none`}>–</div>;
   const isRed = card.suit === 'H' || card.suit === 'D';
   return (
-    <div className={`card card-${size} ${isRed ? 'card-isRed' : 'card-black'}`}>
-      <span className="card-rank">{card.rank === 'T' ? '10' : card.rank}</span>
-      <span className="card-suit">{SUIT_SYMBOL[card.suit]}</span>
+    <div className={`card card-${size} ${isRed ? 'card-red' : 'card-black'}`}>
+      <span>{card.rank === 'T' ? '10' : card.rank}</span>
+      <span>{SUIT_SYMBOL[card.suit]}</span>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { presetBots, type PresetId } from '../bots/presets/catalog';
-import type { PresetBot } from '../bots/types';
+import { presetBots } from '../bots/presets/catalog';
+import type { PresetBot, PresetId } from '../bots/types';
 
 export function readPresetSourceFromDisk(id: PresetId): string {
   const fileUrl = new URL(`../bots/presets/${id}.js`, import.meta.url);

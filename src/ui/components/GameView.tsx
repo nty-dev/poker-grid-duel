@@ -20,7 +20,7 @@ export function GameView({ config, seats, endActions }: GameViewProps) {
 
   return (
     <div className="game">
-      <div className="board-wrap">
+      <div>
         <div className="axis-hint">
           <span className="rows-text">Rows → {seats.rows.name}</span> ·{' '}
           <span className="columns-text">Columns ↓ {seats.columns.name}</span>

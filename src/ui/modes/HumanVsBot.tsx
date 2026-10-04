@@ -4,6 +4,7 @@ import { createBotPlayer } from '../../bots/runner';
 import { otherSeat } from '../../engine/gameState/readGameState';
 import type { GameConfig, Seat } from '../../engine/types';
 import { randomGameSeed } from '../browser';
+import { BotDescription } from '../components/BotDescription';
 import { GameView } from '../components/GameView';
 import { OpponentPicker } from '../components/OpponentPicker';
 import { PRESET_BOTS } from '../presetSources';
@@ -41,6 +42,7 @@ function startGame(
 
 export function HumanVsBot() {
   const [setup, setSetup] = useState<Setup>({ humanSeat: 'rows', humanMovesFirst: true });
+  const [pickedBot, setPickedBot] = useState<PresetBot | null>(null);
   const [startedGame, setStartedGame] = useState<StartedGame | null>(null);
 
   if (startedGame) {
@@ -100,10 +102,13 @@ export function HumanVsBot() {
           ))}
         </fieldset>
       </section>
-      <OpponentPicker
-        bots={PRESET_BOTS}
-        onPick={(bot) => setStartedGame(startGame(setup, bot, 1))}
-      />
+      <OpponentPicker bots={PRESET_BOTS} picked={pickedBot} onPick={setPickedBot} />
+      {pickedBot && (
+        <BotDescription
+          bot={pickedBot}
+          onDuel={() => setStartedGame(startGame(setup, pickedBot, 1))}
+        />
+      )}
     </main>
   );
 }

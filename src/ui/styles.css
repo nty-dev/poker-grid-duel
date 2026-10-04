@@ -128,6 +128,11 @@ h3 {
   transform: translateY(-1px);
 }
 
+.opponent.picked {
+  border-color: var(--columns);
+  box-shadow: inset 0 0 0 1px var(--columns);
+}
+
 .opponent-name {
   font-weight: 600;
 }
@@ -141,6 +146,49 @@ h3 {
 .opponent-desc {
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.bot-description-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.bot-description-heading h2 {
+  margin: 0;
+}
+
+.bot-description p,
+.bot-description li {
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.bot-description h3 {
+  margin-top: 14px;
+}
+
+.bot-description .formula {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.bot-description table {
+  border-collapse: collapse;
+  margin: 0 0 10px;
+}
+
+.bot-description th,
+.bot-description td {
+  text-align: left;
+  vertical-align: top;
+  padding: 4px 12px 4px 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .rules p {

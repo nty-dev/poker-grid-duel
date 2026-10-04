@@ -1,5 +1,5 @@
-import { presetBots, type PresetId } from '../bots/presets/catalog';
-import type { PresetBot } from '../bots/types';
+import { presetBots } from '../bots/presets/catalog';
+import type { PresetBot, PresetId } from '../bots/types';
 
 const sourceByPath = import.meta.glob<string>('../bots/presets/*.js', {
   query: '?raw',
