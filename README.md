@@ -47,17 +47,18 @@ npm run sim -- --games=200 --seed=1    # rate the bots
 
 ## How the bots work
 
-A bot is one function. It is called on its turn and returns the position of an empty cell, as `{ row, column }` with both from 0 to 4:
+A bot is a TypeScript module that implements one method. It is called on its turn and returns the position of an empty cell:
 
-```js
-function chooseMove(view, helpers) {
-  return helpers.emptyPositions(view.board)[0];
+```ts
+interface Bot {
+  chooseMove(view: BotView): Position;
 }
 ```
 
-- **`view`** is everything the bot may know: `board`, `mySeat`, `currentCard`, `nextCard`. The view holds nothing from the rest of the deck; a bot that wants the cards still to come works them out from what it can see.
-- **`helpers`** are pure functions: `emptyPositions`, `lineOf`, `evaluateHand`, `place`, and a seeded `random` and `shuffle`.
-- A bot that throws or returns anything but the position of an empty cell forfeits that game.
+- **`view`** is everything the bot is told: `board`, `mySeat`, `currentCard`, `nextCard`. It holds nothing from the rest of the deck; a bot that wants the cards still to come works them out from what it can see.
+- **Randomness** comes from a seeded generator handed to the bot when it is created (`createBot(rng)`), so a tournament run can be repeated exactly.
+- **The firewall.** A bot never receives the game state, and an ESLint rule limits what the files in `src/bots/presets/` may import to the rules of the game: types, points table, hand evaluator, scoring, the deck and read-only board functions. Importing what deals or advances a game fails `npm run check`.
+- A bot that throws or chooses anything but an empty cell forfeits that game.
 
 | Bot | Strategy | Rating |
 |---|---|---|
@@ -76,13 +77,13 @@ flowchart LR
     scoring[scoring.ts] --> evaluator[evaluator.ts]
   end
   subgraph bots [src/bots]
-    api[types.ts + api.ts<br/>bot contract + helpers] --> runner[runner.ts<br/>compile / ask / validate]
-    presets[presets/*.js<br/>random, greedy, montecarlo] -. written against .-> api
+    presets[presets/*.ts<br/>random, greedy, montecarlo] -. implement .-> contract[types.ts<br/>Bot interface]
+    runner[runner.ts<br/>state to view / ask / validate] --> contract
   end
   subgraph evaluation [src/evaluation]
     match[match.ts<br/>paired seeds] --> stats[stats.ts<br/>CI over pairs]
   end
-  view -- BotView only --> bots
+  view -- BotView only --> runner
   match -- step --> game
   match --> runner
   ui[src/ui: React<br/>Human vs Human, Human vs Bot] --> game & runner
@@ -100,7 +101,7 @@ Every significant choice, with the alternatives considered, is in **[DECISIONS.m
 
 ```
 src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, botView, gameState/ (advanceGame, readGameState)
-src/bots        types (bot contract), api (helpers), runner, presets/ (3 bots + catalog)
+src/bots        types (Bot interface), runner, presets/ (3 bots + catalog)
 src/evaluation  match runner, stats (confidence interval, Elo gap)
 src/sim         rating tournament CLI, arg parsing
 src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, useGame

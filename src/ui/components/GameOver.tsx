@@ -29,9 +29,7 @@ function LineScores({
 }) {
   return (
     <div className={`line-list ${seat}`}>
-      <h3>
-        {ownerName}&apos;s {seat}
-      </h3>
+      <h3>{ownerName === 'You' ? `Your ${seat}` : `${ownerName}'s ${seat}`}</h3>
       {lines.map((line, lineNumber) => (
         <div key={lineNumber} className="line-row">
           <span>

@@ -1,9 +1,9 @@
-import type { BotPlayer, ForfeitReason } from '../bots/types';
+import { askBotForMove } from '../bots/runner';
+import type { Bot, ForfeitReason } from '../bots/types';
 import { newGame, step } from '../engine/gameState/advanceGame';
 import { isGameOver, otherSeat } from '../engine/gameState/readGameState';
 import { scoreBoard } from '../engine/scoring';
 import type { GameConfig, Seat } from '../engine/types';
-import { toBotView } from '../engine/botView';
 
 type Side = 'A' | 'B';
 
@@ -34,7 +34,7 @@ function dealForPair(pairNumber: number, baseSeed: number): GameConfig {
 }
 
 export function playGame(
-  players: Readonly<Record<Side, BotPlayer>>,
+  players: Readonly<Record<Side, Bot>>,
   config: GameConfig,
   seatOfA: Seat,
 ): GameRecord {
@@ -42,7 +42,7 @@ export function playGame(
   while (!isGameOver(state)) {
     const seat = state.toMove;
     const side: Side = seat === seatOfA ? 'A' : 'B';
-    const decision = players[side].chooseMove(toBotView(state, seat));
+    const decision = askBotForMove(players[side], state);
     if (!decision.ok) {
       const { reason, detail } = decision;
       return { config, seatOfA, result: { kind: 'forfeit', by: side, reason, detail } };
@@ -63,7 +63,7 @@ export function playGame(
 }
 
 export function runMatch(
-  players: Readonly<Record<Side, BotPlayer>>,
+  players: Readonly<Record<Side, Bot>>,
   { pairCount, baseSeed }: MatchOptions,
 ): GamePair[] {
   const gamePairs: GamePair[] = [];

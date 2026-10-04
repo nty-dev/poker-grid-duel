@@ -1,67 +1,31 @@
+import { toBotView } from '../engine/botView';
 import { isOnBoard } from '../engine/gameState/readGameState';
-import type { BotView, Position, Seed } from '../engine/types';
-import { createBotHelpers } from './api';
-import type { BotHelpers, ChooseMove, BotDecision, BotPlayer } from './types';
+import type { BotView, GameState, Position } from '../engine/types';
+import type { Bot, BotDecision } from './types';
 
-export function compileTrustedBotSource(source: string): ChooseMove {
-  const extractChooseMove = new Function(
-    `"use strict";\n${source}\n;return typeof chooseMove === "function" ? chooseMove : undefined;`,
-  ) as () => unknown;
-  const chooseMove = extractChooseMove();
-  if (typeof chooseMove !== 'function') {
-    throw new TypeError('Bot source must define function chooseMove(view, helpers)');
-  }
-  return chooseMove as ChooseMove;
+function describeThrown(thrown: unknown): string {
+  return thrown instanceof Error ? `${thrown.name}: ${thrown.message}` : String(thrown);
 }
 
-function toJsonIfPossible(value: unknown): string | undefined {
+function validateBotAnswer(view: BotView, position: Position): BotDecision {
+  const { row, column } = position;
+  const isEmptyCell = isOnBoard(position) && view.board[row]?.[column] === null;
+  if (isEmptyCell) return { ok: true, position: { row, column } };
+  return {
+    ok: false,
+    reason: 'invalid_move',
+    detail: `chose row ${row}, column ${column}, which is not an empty cell`,
+  };
+}
+
+export function askBotForMove(bot: Bot, state: GameState): BotDecision {
+  const view = toBotView(state, state.toMove);
+  const cloneOfView = structuredClone(view);
+  let answer: Position;
   try {
-    return JSON.stringify(value);
-  } catch {
-    return undefined;
-  }
-}
-
-function describeBotOutput(value: unknown): string {
-  if (value instanceof Error) return `${value.name}: ${value.message}`;
-  return toJsonIfPossible(value) ?? String(value);
-}
-
-function isValidPosition(answer: unknown): answer is Position {
-  if (typeof answer !== 'object' || answer === null) return false;
-  const { row, column } = answer as Partial<Position>;
-  return typeof row === 'number' && typeof column === 'number' && isOnBoard({ row, column });
-}
-
-function validateBotAnswer(view: BotView, answer: unknown): BotDecision {
-  const isEmptyCell = isValidPosition(answer) && view.board[answer.row]?.[answer.column] === null;
-  if (isEmptyCell) {
-    return { ok: true, position: { row: answer.row, column: answer.column } };
-  }
-  return { ok: false, reason: 'invalid_move', detail: `returned ${describeBotOutput(answer)}` };
-}
-
-export function askBotForMove(
-  chooseMove: ChooseMove,
-  view: BotView,
-  helpers: BotHelpers,
-): BotDecision {
-  let answer: unknown;
-  try {
-    answer = chooseMove(view, helpers);
+    answer = bot.chooseMove(cloneOfView);
   } catch (thrown) {
-    return { ok: false, reason: 'exception', detail: describeBotOutput(thrown) };
+    return { ok: false, reason: 'exception', detail: describeThrown(thrown) };
   }
   return validateBotAnswer(view, answer);
-}
-
-export function createBotPlayer(source: string, rngSeed: Seed): BotPlayer {
-  const chooseMove = compileTrustedBotSource(source);
-  const helpers = createBotHelpers(rngSeed);
-  return {
-    chooseMove: (view) => {
-      const cloneOfView = structuredClone(view);
-      return askBotForMove(chooseMove, cloneOfView, helpers);
-    },
-  };
 }

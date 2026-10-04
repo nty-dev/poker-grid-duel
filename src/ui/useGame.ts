@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { BotPlayer, ForfeitReason } from '../bots/types';
+import { askBotForMove } from '../bots/runner';
+import type { Bot, ForfeitReason } from '../bots/types';
 import { newGame, step } from '../engine/gameState/advanceGame';
 import { isGameOver } from '../engine/gameState/readGameState';
 import { scoreBoard } from '../engine/scoring';
 import type { BoardScore, GameConfig, GameError, Position, Seat } from '../engine/types';
-import { toBotView } from '../engine/botView';
 
 const BOT_THINKING_DISPLAY_MS = 400;
 
 type Participant =
   | { readonly kind: 'human'; readonly name: string }
-  | { readonly kind: 'bot'; readonly name: string; readonly player: BotPlayer };
+  | { readonly kind: 'bot'; readonly name: string; readonly bot: Bot };
 
 export type Seats = Readonly<Record<Seat, Participant>>;
 
@@ -53,9 +53,8 @@ export function useGame(config: GameConfig, seats: Seats) {
   useEffect(() => {
     if (!isInProgress || participantToMove.kind !== 'bot') return;
     const seat = state.toMove;
-    const view = toBotView(state, seat);
     const moveTimer = setTimeout(() => {
-      const decision = participantToMove.player.chooseMove(view);
+      const decision = askBotForMove(participantToMove.bot, state);
       if (!decision.ok) {
         setEnd({ kind: 'forfeit', seat, reason: decision.reason, detail: decision.detail });
         return;

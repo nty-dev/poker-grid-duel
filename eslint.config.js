@@ -28,15 +28,26 @@ export default tseslint.config(
     },
   },
   {
-    // Preset bot source: plain scripts run via new Function. No browser or
-    // Node globals: a bot only gets its arguments.
-    extends: [js.configs.recommended],
-    files: ['src/bots/**/*.js'],
-    languageOptions: { sourceType: 'script', globals: {} },
+    // The firewall between a bot and the game: a bot is given only a BotView,
+    // and may import only the rules of the game. It cannot import what deals
+    // or advances a game, a random number generator of its own, or the code
+    // that runs it.
+    files: ['src/bots/presets/*.ts'],
+    ignores: ['src/bots/presets/catalog.ts'],
     rules: {
-      ...determinism,
-      // chooseMove is the bot's entry point: the runner reads it, nothing in the file calls it.
-      'no-unused-vars': ['error', { varsIgnorePattern: '^chooseMove$' }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex:
+                '^(?!(\\.\\./\\.\\./engine/(types|rules|evaluator|scoring|deck|gameState/readGameState)|\\.\\./types)$)',
+              message:
+                'A bot may import only engine/{types,rules,evaluator,scoring,deck,gameState/readGameState} and bots/types.',
+            },
+          ],
+        },
+      ],
     },
   },
   {

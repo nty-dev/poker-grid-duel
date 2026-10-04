@@ -76,6 +76,5 @@ export interface BotView {
 export type Seed = number | string;
 
 export interface Rng {
-  nextFloat(): number;
   nextIntBelow(limit: number): number;
 }

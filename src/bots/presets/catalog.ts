@@ -1,28 +1,28 @@
-import type { PresetBot, PresetId } from '../types';
+import type { PresetBot } from '../types';
+import { createGreedyBot } from './greedy';
+import { createMonteCarloBot } from './montecarlo';
+import { createRandomBot } from './random';
 
-type PresetInfo = Omit<PresetBot, 'source'>;
-
-const PRESET_INFO: readonly PresetInfo[] = [
+export const PRESET_BOTS: readonly PresetBot[] = [
   {
     id: 'random',
     name: 'Random',
     description: 'Places each card in a random empty cell.',
     ratingFromTournament: 800,
+    createBot: createRandomBot,
   },
   {
     id: 'greedy',
     name: 'Greedy',
     description: 'Best immediate change in line potential, mine minus yours.',
     ratingFromTournament: 1354,
+    createBot: createGreedyBot,
   },
   {
     id: 'montecarlo',
     name: 'Monte Carlo',
     description: 'Plays 100 random futures per candidate cell.',
     ratingFromTournament: 1576,
+    createBot: createMonteCarloBot,
   },
 ];
-
-export function presetBots(loadSourceOfPresetFile: (id: PresetId) => string): PresetBot[] {
-  return PRESET_INFO.map((info) => ({ ...info, source: loadSourceOfPresetFile(info.id) }));
-}

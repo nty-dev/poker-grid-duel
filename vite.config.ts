@@ -4,14 +4,12 @@ import react from '@vitejs/plugin-react';
 
 /**
  * Content-Security-Policy for the production build: the app is static and
- * needs no network (connect-src 'none') and no remote scripts. 'unsafe-eval'
- * is required because preset bots are compiled from source with new Function
- * (src/bots/runner.ts). Dev builds skip the policy: Vite's dev server needs
- * inline scripts.
+ * needs no network (connect-src 'none'), no remote scripts and no eval.
+ * Dev builds skip the policy: Vite's dev server needs inline scripts.
  */
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval'",
+  "script-src 'self'",
   "connect-src 'none'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",

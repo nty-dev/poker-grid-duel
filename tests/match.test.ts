@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import type { BotPlayer } from '../src/bots/types';
-import { createBotPlayer } from '../src/bots/runner';
+import { createGreedyBot } from '../src/bots/presets/greedy';
+import { createRandomBot } from '../src/bots/presets/random';
+import type { Bot } from '../src/bots/types';
 import { emptyPositions } from '../src/engine/gameState/readGameState';
+import { createRng } from '../src/engine/rng';
 import type { Position } from '../src/engine/types';
 import { playGame, runMatch } from '../src/evaluation/match';
-import { readPresetSourceFromDisk } from '../src/sim/presetSources';
 
-const random = () => createBotPlayer(readPresetSourceFromDisk('random'), 1);
-const greedy = () => createBotPlayer(readPresetSourceFromDisk('greedy'), 1);
+const random = () => createRandomBot(createRng(1));
+const greedy = () => createGreedyBot();
 
 describe('runMatch', () => {
   it('plays each seed twice with the seats swapped, and alternates which seat moves first', () => {
@@ -28,16 +29,15 @@ describe('runMatch', () => {
 
 describe('playGame', () => {
   it('ends the game when a bot forfeits, recording who and why', () => {
-    const quitsOnSeventhMove: BotPlayer = {
+    const throwsOnSeventhMove: Bot = {
       chooseMove: (view) => {
         const cardsOnBoard = view.board.flat().filter((cell) => cell !== null).length;
-        return cardsOnBoard < 6
-          ? { ok: true, position: emptyPositions(view.board)[0] as Position }
-          : { ok: false, reason: 'exception', detail: 'Error: boom' };
+        if (cardsOnBoard >= 6) throw new Error('boom');
+        return emptyPositions(view.board)[0] as Position;
       },
     };
     const game = playGame(
-      { A: quitsOnSeventhMove, B: quitsOnSeventhMove },
+      { A: throwsOnSeventhMove, B: throwsOnSeventhMove },
       { seed: 1, firstMover: 'rows' },
       'rows',
     );

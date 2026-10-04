@@ -1,13 +1,13 @@
 import { useState } from 'react';
+import { PRESET_BOTS } from '../../bots/presets/catalog';
 import type { PresetBot } from '../../bots/types';
-import { createBotPlayer } from '../../bots/runner';
 import { otherSeat } from '../../engine/gameState/readGameState';
+import { createRng } from '../../engine/rng';
 import type { GameConfig, Seat } from '../../engine/types';
 import { randomGameSeed } from '../browser';
 import { BotDescription } from '../components/BotDescription';
 import { GameView } from '../components/GameView';
 import { OpponentPicker } from '../components/OpponentPicker';
-import { PRESET_BOTS } from '../presetSources';
 import { assignSeats, type Seats } from '../useGame';
 
 interface Setup {
@@ -33,7 +33,7 @@ function startGame(
     {
       kind: 'bot',
       name: opponent.name,
-      player: createBotPlayer(opponent.source, randomGameSeed()),
+      bot: opponent.createBot(createRng(randomGameSeed())),
     },
   );
   const firstMover = humanMovesFirst ? humanSeat : otherSeat(humanSeat);

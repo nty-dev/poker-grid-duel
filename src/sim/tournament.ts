@@ -1,9 +1,9 @@
-import { createBotPlayer } from '../bots/runner';
+import { PRESET_BOTS } from '../bots/presets/catalog';
 import type { PresetBot } from '../bots/types';
+import { createRng } from '../engine/rng';
 import { runMatch } from '../evaluation/match';
 import { eloGapFromScoreRate, summarizeMatch } from '../evaluation/stats';
 import { parseArgs } from './args';
-import { loadPresetBotsFromDisk } from './presetSources';
 
 const USAGE = 'npm run sim -- [--games=200] [--seed=1]';
 const ANCHOR_RATING_OF_WEAKEST_BOT = 800;
@@ -13,8 +13,8 @@ const roundTo4Decimals = (value: number) => +value.toFixed(4);
 function playRatingMatch(bot: PresetBot, opponent: PresetBot, games: number, seed: number) {
   console.error(`Playing ${bot.id} vs ${opponent.id} (${games} games)...`);
   const players = {
-    A: createBotPlayer(bot.source, `${seed}/${bot.id}`),
-    B: createBotPlayer(opponent.source, `${seed}/${opponent.id}`),
+    A: bot.createBot(createRng(`${seed}/${bot.id}`)),
+    B: opponent.createBot(createRng(`${seed}/${opponent.id}`)),
   };
   const stats = summarizeMatch(runMatch(players, { pairCount: games / 2, baseSeed: seed }));
   const interval = stats.scoreRateInterval;
@@ -38,11 +38,10 @@ function main(): void {
   }
   const { games, seed } = parsed.value;
 
-  const presetsWeakestFirst = loadPresetBotsFromDisk();
   const matches: ReturnType<typeof playRatingMatch>[] = [];
   const calibratedRatings: Record<string, number> = {};
   let previousRated: { bot: PresetBot; rating: number } | null = null;
-  for (const bot of presetsWeakestFirst) {
+  for (const bot of PRESET_BOTS) {
     let rating = ANCHOR_RATING_OF_WEAKEST_BOT;
     if (previousRated) {
       const match = playRatingMatch(bot, previousRated.bot, games, seed);
