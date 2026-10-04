@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { compareBySuitThenRank } from '../src/engine/deck';
 import {
   currentCard,
   emptyPositions,
@@ -121,11 +120,14 @@ describe('a whole game', () => {
 describe('toBotView', () => {
   const state = newGame({ seed: 10, firstMover: 'rows' });
 
-  it('shows the current and next cards, and the rest of the deck in sorted order', () => {
-    const view = toBotView(state, 'columns');
-    expect(view.currentCard).toEqual(state.deck[0]);
-    expect(view.nextCard).toEqual(state.deck[1]);
-    expect(view.unseenCards).toEqual(state.deck.slice(2).sort(compareBySuitThenRank));
+  it('shows the board, the current and next cards, the seat and the move number', () => {
+    expect(toBotView(state, 'columns')).toEqual({
+      board: state.board,
+      mySeat: 'columns',
+      currentCard: state.deck[0],
+      nextCard: state.deck[1],
+      moveNumber: 0,
+    });
   });
 
   it('is identical for two decks that differ only in the order of the hidden cards', () => {
@@ -135,12 +137,11 @@ describe('toBotView', () => {
     expect(toBotView(sameCardsOtherOrder, 'rows')).toEqual(toBotView(state, 'rows'));
   });
 
-  it('has no next card on the last turn, and the 26th card stays unseen', () => {
+  it('has no next card on the last turn', () => {
     const { moves } = playRandomGame(8);
     const beforeLastMove = replay({ seed: 8, firstMover: 'rows' }, moves.slice(0, 24));
     if (!beforeLastMove.ok) throw new Error('replay failed');
     const view = toBotView(beforeLastMove.state, beforeLastMove.state.toMove);
     expect(view.nextCard).toBeNull();
-    expect(view.unseenCards).toHaveLength(52 - 25);
   });
 });

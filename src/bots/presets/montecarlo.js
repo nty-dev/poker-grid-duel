@@ -6,18 +6,33 @@
 
 const PLAYOUTS = 100;
 const BOARD_SIZE = 5;
+const SUITS = 'SHDC';
+const RANKS = '23456789TJQKA';
 
 const ALL_POSITIONS = [];
 for (let row = 0; row < BOARD_SIZE; row++) {
   for (let column = 0; column < BOARD_SIZE; column++) ALL_POSITIONS.push({ row, column });
 }
 
+function cardsNotYetSeen(view) {
+  const seenCards = view.board.flat().concat(view.currentCard, view.nextCard);
+  const seenLabels = new Set(seenCards.map((card) => card && card.rank + card.suit));
+  const cards = [];
+  for (const suit of SUITS) {
+    for (const rank of RANKS) {
+      if (!seenLabels.has(rank + suit)) cards.push({ rank, suit });
+    }
+  }
+  return cards;
+}
+
 function chooseMove(view, helpers) {
+  const unseenCards = cardsNotYetSeen(view);
   // Every candidate position is judged on the same sampled futures. Otherwise
   // one could look better only because it happened to draw luckier cards.
   const sampledFutures = [];
   for (let playout = 0; playout < PLAYOUTS; playout++) {
-    const shuffledUnseen = helpers.shuffle(view.unseenCards);
+    const shuffledUnseen = helpers.shuffle(unseenCards);
     sampledFutures.push({
       cardsToCome: view.nextCard ? [view.nextCard].concat(shuffledUnseen) : shuffledUnseen,
       fillOrder: helpers.shuffle(ALL_POSITIONS),

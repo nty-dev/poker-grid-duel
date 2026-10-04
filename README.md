@@ -57,7 +57,7 @@ function chooseMove(view, helpers) {
 }
 ```
 
-- **`view`** is everything the bot may know: `board`, `mySeat`, `currentCard`, `nextCard`, `unseenCards`, `moveNumber`. `unseenCards` is sorted, so it says which cards are left but not their order.
+- **`view`** is everything the bot may know: `board`, `mySeat`, `currentCard`, `nextCard`, `moveNumber`. The view holds nothing from the rest of the deck; a bot that wants the cards still to come works them out from what it can see.
 - **`helpers`** are pure functions: `emptyPositions`, `lineOf`, `evaluateHand`, `place`, and a seeded `random` and `shuffle`.
 - A bot that throws or returns anything but the position of an empty cell forfeits that game.
 

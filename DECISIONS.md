@@ -56,7 +56,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 
 ### D6. Hidden information: `BotView`
 - **Context:** Bots must not cheat.
-- **Decision:** Bots receive only `toBotView(state, seat)`: board, seat, current and next cards, `unseenCards` (the remaining cards **sorted canonically**) and the move number. Two states whose decks differ only in hidden order produce identical views, and a test asserts this. On the last turn `nextCard` is `null` and the 26th card stays in `unseenCards`: it is never revealed.
+- **Decision:** Bots receive only `toBotView(state, seat)`: board, seat, current and next cards, and the move number. **Nothing from the rest of the deck is in the view**, so two states whose decks differ only in hidden order produce identical views, and a test asserts this. A bot that needs the cards still to come works them out itself: the 52 cards minus the ones it can see (Monte Carlo does this). On the last turn `nextCard` is `null`: the 26th card is never revealed.
 - **Trade-offs:** Sorting about 50 cards per bot move is negligible.
 
 ### D7. Evaluator semantics
@@ -79,7 +79,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 ### D10. Monte Carlo instead of minimax or alpha-beta
 - **Context:** Hidden information (deck order) and chance (every draw).
 - **Options:** Expectimax or minimax over chance nodes; MCTS (UCT); flat Monte Carlo with determinisation.
-- **Decision:** Flat Monte Carlo. For each empty cell, run N playouts. Each playout **determinises** by shuffling only `unseenCards` (the next card stays on top), places the current card, then fills the rest randomly. With both sides random, who places which card doesn't matter, so a playout is "a random empty cell for each card in deck order". The bot picks the best mean of `(my score − their score)`.
+- **Decision:** Flat Monte Carlo. For each empty cell, run N playouts. Each playout **determinises** by shuffling only the cards it has not seen (the next card stays on top), places the current card, then fills the rest randomly. With both sides random, who places which card doesn't matter, so a playout is "a random empty cell for each card in deck order". The bot picks the best mean of `(my score − their score)`.
 - **Why not minimax:** The branching factor is up to 25 cells × about 40 possible next cards per ply, over 25 plies. A depth-limited search would need a heuristic evaluation anyway (which is what Greedy is). Monte Carlo gets an unbiased value estimate from the real scoring function, and its quality scales with a single knob, N.
 - **Known weakness:** Determinisation leads to "strategy fusion": the playouts assume perfect knowledge of the future deck. With random playouts this mostly adds noise rather than bias.
 - **Common random numbers:** Every candidate cell is evaluated on the **same** N seeds, so all cells see the same deck orders. This removes deck luck from the comparison *between* cells and lowers the variance of the choice at no extra cost.
@@ -178,7 +178,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Options:**
   - Numbers 2–14: the evaluator does plain arithmetic, and display code converts 11–14 to J, Q, K, A.
   - Labels `'2'`…`'9'`, `'T'`, `'J'`, `'Q'`, `'K'`, `'A'`: data reads as cards, and the code that needs order converts a label to its position in `RANKS`.
-- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in three places: `fiveDistinctRanksAreConsecutive` in the evaluator, Greedy's straight-draw check, and `compareBySuitThenRank`, which sorts the unseen cards. Equality needs no conversion.
+- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `fiveDistinctRanksAreConsecutive` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
 - **Trade-offs:**
   - Logged and stored cards are readable (`{ rank: 'K', suit: 'H' }`), and the display mappings are gone, apart from showing `'T'` as "10".
   - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11, D19 and BALANCE.md were taken before this change.

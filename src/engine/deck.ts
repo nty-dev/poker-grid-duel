@@ -18,9 +18,3 @@ function swap<T>(items: T[], first: number, second: number): void {
   items[first] = items[second] as T;
   items[second] = held;
 }
-
-export function compareBySuitThenRank(a: Card, b: Card): number {
-  return a.suit === b.suit
-    ? RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank)
-    : SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit);
-}
