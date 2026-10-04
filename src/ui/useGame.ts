@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { BotPlayer, ForfeitReason } from '../bots/types';
-import { isGameOver, newGame, step } from '../engine/game';
+import { newGame, step } from '../engine/gameState/advanceGame';
+import { isGameOver } from '../engine/gameState/readGameState';
 import { scoreBoard } from '../engine/scoring';
 import type { BoardScore, GameConfig, GameError, Position, Seat } from '../engine/types';
 import { toBotView } from '../engine/botView';

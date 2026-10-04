@@ -1,5 +1,6 @@
 import type { BotPlayer, ForfeitReason } from '../bots/types';
-import { isGameOver, newGame, otherSeat, step } from '../engine/game';
+import { newGame, step } from '../engine/gameState/advanceGame';
+import { isGameOver, otherSeat } from '../engine/gameState/readGameState';
 import { scoreBoard } from '../engine/scoring';
 import type { GameConfig, Seat } from '../engine/types';
 import { toBotView } from '../engine/botView';

@@ -9,7 +9,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Options:**
   - A flat list of 25, with `index = row * 5 + column`. This was the original choice.
   - A 5×5 grid, `board[row][column]`, with a cell addressed by a `Position { row, column }`.
-- **Decision:** The grid. A move, a bot's answer and a UI click are all a `Position`. `withCardAt(board, position, card)` in `game.ts` is the one function that builds a board with a card added; `step`, the bot helper `place` and the UI's placement preview all use it.
+- **Decision:** The grid. A move, a bot's answer and a UI click are all a `Position`. `withCardAt(board, position, card)` in `gameState/advanceGame.ts` is the one function that builds a board with a card added; `step`, the bot helper `place` and the UI's placement preview all use it.
 - **Why:** The game is about rows and columns, so the data should say rows and columns. The flat list needed index arithmetic (`Math.floor(cell / 5)`, `cell % 5`, `row * 5 + column`) in the scoring code, both bots and the UI. With the grid there is none: a row is `board[row]`, and a column is one `map`.
 - **Why `{ row, column }` and not a tuple or `(x, y)`:** Named fields can't be swapped by accident. With `(x, y)`, x is the column and y the row, so the grid would be read as `board[y][x]`, which is easy to get backwards.
 - **Trade-offs:**
@@ -178,7 +178,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Options:**
   - Numbers 2–14: the evaluator does plain arithmetic, and display code converts 11–14 to J, Q, K, A.
   - Labels `'2'`…`'9'`, `'T'`, `'J'`, `'Q'`, `'K'`, `'A'`: data reads as cards, and the code that needs order converts a label to its position in `RANKS`.
-- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `isStraight` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
+- **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `isStraightFun` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
 - **Trade-offs:**
   - Logged and stored cards are readable (`{ rank: 'K', suit: 'H' }`), and the display mappings are gone, apart from showing `'T'` as "10".
   - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11 and D19 were taken before this change.

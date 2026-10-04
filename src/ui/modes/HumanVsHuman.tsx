@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { otherSeat } from '../../engine/game';
+import { otherSeat } from '../../engine/gameState/readGameState';
 import type { GameConfig, Seat } from '../../engine/types';
 import { randomGameSeed } from '../browser';
 import { GameView } from '../components/GameView';

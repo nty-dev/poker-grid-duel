@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { BotPlayer } from '../src/bots/types';
 import { createBotPlayer } from '../src/bots/runner';
-import { emptyPositions } from '../src/engine/game';
+import { emptyPositions } from '../src/engine/gameState/readGameState';
 import type { Position } from '../src/engine/types';
 import { playGame, runMatch } from '../src/evaluation/match';
 import { readPresetSourceFromDisk } from '../src/sim/presetSources';

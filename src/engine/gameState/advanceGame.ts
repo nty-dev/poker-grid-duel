@@ -1,6 +1,6 @@
-import { createDeck, fisherYatesShuffle } from './deck';
-import { createRng } from './rng';
-import { BOARD_SIZE } from './rules';
+import { createDeck, fisherYatesShuffle } from '../deck';
+import { createRng } from '../rng';
+import { BOARD_SIZE } from '../rules';
 import type {
   Board,
   Card,
@@ -9,13 +9,9 @@ import type {
   GameState,
   Move,
   Position,
-  Seat,
   StepResult,
-} from './types';
-
-export function otherSeat(seat: Seat): Seat {
-  return seat === 'rows' ? 'columns' : 'rows';
-}
+} from '../types';
+import { countPlacedCards, currentCard, isGameOver, isOnBoard, otherSeat } from './readGameState';
 
 function emptyBoard(): Board {
   return Array.from({ length: BOARD_SIZE }, () => Array.from({ length: BOARD_SIZE }, () => null));
@@ -29,46 +25,12 @@ export function newGame({ seed, firstMover }: GameConfig): GameState {
   };
 }
 
-export function isOnBoard({ row, column }: Position): boolean {
-  const isLineNumber = (value: number) =>
-    Number.isInteger(value) && value >= 0 && value < BOARD_SIZE;
-  return isLineNumber(row) && isLineNumber(column);
-}
-
-export function emptyPositions(board: Board): Position[] {
-  const positions: Position[] = [];
-  board.forEach((cellsInRow, row) => {
-    cellsInRow.forEach((cell, column) => {
-      if (cell === null) positions.push({ row, column });
-    });
-  });
-  return positions;
-}
-
 export function withCardAt(board: Board, position: Position, card: Card): Board {
   return board.map((cellsInRow, row) =>
     row === position.row
       ? cellsInRow.map((cell, column) => (column === position.column ? card : cell))
       : cellsInRow,
   );
-}
-
-export function countPlacedCards(state: GameState): number {
-  return state.board.flat().filter((cell) => cell !== null).length;
-}
-
-export function isGameOver(state: GameState): boolean {
-  return emptyPositions(state.board).length === 0;
-}
-
-export function currentCard(state: GameState): Card | null {
-  return isGameOver(state) ? null : (state.deck[countPlacedCards(state)] ?? null);
-}
-
-export function nextCard(state: GameState): Card | null {
-  const isLastTurn = emptyPositions(state.board).length <= 1;
-  if (isLastTurn) return null;
-  return state.deck[countPlacedCards(state) + 1] ?? null;
 }
 
 function findMoveError(state: GameState, { seat, position }: Move): GameError | null {

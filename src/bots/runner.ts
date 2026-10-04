@@ -1,4 +1,4 @@
-import { isOnBoard } from '../engine/game';
+import { isOnBoard } from '../engine/gameState/readGameState';
 import type { BotView, Position, Seed } from '../engine/types';
 import { createBotHelpers } from './api';
 import type { BotHelpers, ChooseMove, BotDecision, BotPlayer } from './types';

@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { newGame, step } from '../src/engine/gameState/advanceGame';
 import {
   currentCard,
   emptyPositions,
   isGameOver,
-  newGame,
   nextCard,
-  step,
-} from '../src/engine/game';
+} from '../src/engine/gameState/readGameState';
 import { createRng } from '../src/engine/rng';
 import type { Cell, GameState, Move, Position } from '../src/engine/types';
 import { toBotView } from '../src/engine/botView';

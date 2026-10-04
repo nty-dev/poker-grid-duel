@@ -13,15 +13,15 @@ export function classifyHand(cards: readonly Card[]): HandType {
 }
 
 function classifyStraightOrFlush(cards: readonly Card[]): HandType {
-  const flush = isFlush(cards);
-  const straight = isStraight(cards);
-  if (flush && straight) return 'straightFlush';
-  if (straight) return 'straight';
-  if (flush) return 'flush';
+  const isFlush = isFlushFun(cards);
+  const isStraight = isStraightFun(cards);
+  if (isFlush && isStraight) return 'straightFlush';
+  if (isStraight) return 'straight';
+  if (isFlush) return 'flush';
   return 'highCard';
 }
 
-function isFlush(cards: readonly Card[]): boolean {
+function isFlushFun(cards: readonly Card[]): boolean {
   return cards.every((card) => card.suit === cards[0]?.suit);
 }
 
@@ -35,7 +35,7 @@ const RANK_INDEX_OF_TWO = RANKS.indexOf('2');
 const RANK_INDEX_OF_FIVE = RANKS.indexOf('5');
 const RANK_INDEX_OF_ACE = RANKS.indexOf('A');
 
-function isStraight(cards: readonly Card[]): boolean {
+function isStraightFun(cards: readonly Card[]): boolean {
   const rankIndexes = cards.map((card) => RANKS.indexOf(card.rank)).sort((a, b) => a - b);
   const [lowest = 0, , , secondHighest = 0, highest = 0] = rankIndexes;
   const isUnbrokenRun = highest - lowest === 4;

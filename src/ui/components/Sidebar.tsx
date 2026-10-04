@@ -1,4 +1,5 @@
-import { currentCard, nextCard, withCardAt } from '../../engine/game';
+import { withCardAt } from '../../engine/gameState/advanceGame';
+import { currentCard, nextCard } from '../../engine/gameState/readGameState';
 import { lineCells, scoreLine } from '../../engine/scoring';
 import type { BoardScore, Board, GameState, Position, Seat } from '../../engine/types';
 import type { Seats } from '../useGame';

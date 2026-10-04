@@ -1,4 +1,4 @@
-import { currentCard, nextCard } from './game';
+import { currentCard, nextCard } from './gameState/readGameState';
 import type { GameState, BotView, Seat } from './types';
 
 export function toBotView(state: GameState, mySeat: Seat): BotView {

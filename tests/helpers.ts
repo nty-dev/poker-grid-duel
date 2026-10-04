@@ -1,5 +1,5 @@
 import { createDeck } from '../src/engine/deck';
-import { newGame, step } from '../src/engine/game';
+import { newGame, step } from '../src/engine/gameState/advanceGame';
 import type {
   Board,
   Card,

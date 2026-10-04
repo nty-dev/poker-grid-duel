@@ -72,7 +72,7 @@ The source is in [`src/bots/presets/`](src/bots/presets/), and [its README](src/
 ```mermaid
 flowchart LR
   subgraph engine [src/engine: pure, deterministic]
-    game[game.ts<br/>newGame / step] --> view[botView.ts<br/>toBotView]
+    game[gameState/<br/>advanceGame: newGame, step<br/>readGameState: queries] --> view[botView.ts<br/>toBotView]
     scoring[scoring.ts] --> evaluator[evaluator.ts]
   end
   subgraph bots [src/bots]
@@ -99,7 +99,7 @@ Every significant choice, with the alternatives considered, is in **[DECISIONS.m
 ## Project layout
 
 ```
-src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, game, botView
+src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, botView, gameState/ (advanceGame, readGameState)
 src/bots        types (bot contract), api (helpers), runner, presets/ (3 bots + catalog)
 src/evaluation  match runner, stats (confidence interval, Elo gap)
 src/sim         rating tournament CLI, arg parsing

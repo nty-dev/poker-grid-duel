@@ -1,7 +1,8 @@
 import { fisherYatesShuffle } from '../engine/deck';
 import { classifyHand } from '../engine/evaluator';
 import type { Board, Position, Seed } from '../engine/types';
-import { emptyPositions, isOnBoard, withCardAt } from '../engine/game';
+import { withCardAt } from '../engine/gameState/advanceGame';
+import { emptyPositions, isOnBoard } from '../engine/gameState/readGameState';
 import { createRng } from '../engine/rng';
 import { BOARD_SIZE, HAND_POINTS } from '../engine/rules';
 import { lineCells } from '../engine/scoring';
@@ -25,8 +26,9 @@ function assertIsLineNumber(lineNumber: number): void {
 }
 
 function assertIsOnBoard(position: Position): void {
-  const isValidPosition = typeof position === 'object' && position !== null && isOnBoard(position);
-  if (!isValidPosition) {
+  const isPositionOnBoard =
+    typeof position === 'object' && position !== null && isOnBoard(position);
+  if (!isPositionOnBoard) {
     throw new RangeError(
       `position must be { row, column } with both 0–${BOARD_SIZE - 1}, got ${JSON.stringify(position)}`,
     );

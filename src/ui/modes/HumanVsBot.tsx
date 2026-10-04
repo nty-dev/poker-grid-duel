@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { PresetBot } from '../../bots/types';
 import { createBotPlayer } from '../../bots/runner';
-import { otherSeat } from '../../engine/game';
+import { otherSeat } from '../../engine/gameState/readGameState';
 import type { GameConfig, Seat } from '../../engine/types';
 import { randomGameSeed } from '../browser';
 import { GameView } from '../components/GameView';

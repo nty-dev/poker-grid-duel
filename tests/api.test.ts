@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createBotHelpers } from '../src/bots/api';
 import { askBotForMove, compileTrustedBotSource, createBotPlayer } from '../src/bots/runner';
-import { newGame } from '../src/engine/game';
+import { newGame } from '../src/engine/gameState/advanceGame';
 import { toBotView } from '../src/engine/botView';
 import { boardFrom, cards, EMPTY_ROWS, parseCard, stateFrom } from './helpers';
 
