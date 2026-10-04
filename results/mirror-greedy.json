@@ -1,0 +1,36 @@
+{
+  "config": {
+    "games": 4000,
+    "seed": 7,
+    "bots": [
+      "greedy",
+      "greedy"
+    ]
+  },
+  "pairs": [
+    {
+      "a": "greedy",
+      "b": "greedy",
+      "aWins": 1799,
+      "draws": 402,
+      "bWins": 1799,
+      "aScoreRate": 0.5,
+      "aScoreRateCi95": [
+        0.5,
+        0.5
+      ],
+      "aAvgScoreDiff": 0,
+      "pairScoreSd": 0
+    }
+  ],
+  "firstMover": {
+    "games": 4000,
+    "score": 0.4858
+  },
+  "msPerMove": {
+    "greedy": 0.26
+  },
+  "calibratedRatings": {
+    "greedy": 800
+  }
+}

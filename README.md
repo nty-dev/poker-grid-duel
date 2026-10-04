@@ -1,0 +1,116 @@
+# Poker Grid Duel
+
+A two-player card game on a shared 5×5 grid. One player scores the **rows** as poker hands and the other scores the **columns**, so every card helps one side and maybe the other.
+
+You can play a friend on one screen, or play one of three bots: Random, Greedy and Monte Carlo. The bots are also played against each other over hundreds of seat-swapped games on shared deals, to measure with confidence intervals how strong each one really is.
+
+## Rules
+
+- Shared 5×5 board, standard 52-card deck shuffled from a seed.
+- One player scores the 5 **rows**, the other the 5 **columns**. Seat and first move are chosen independently.
+- Each turn the top card is revealed (the **current** card), and the card after it is visible too (the **next** card).
+- On your turn, **place the current card** in any empty cell. Players alternate until all 25 cells are full.
+- Every row and column then holds exactly 5 cards and is scored as a poker hand:
+
+| Hand | Points |
+|---|---|
+| High card | 0 |
+| Pair | 2 |
+| Two pair | 5 |
+| Three of a kind | 10 |
+| Flush | 12 |
+| Straight (A-low and A-high, no wrap) | 15 |
+| Full house | 20 |
+| Four of a kind | 40 |
+| Straight flush | 60 |
+
+Higher total wins; equal totals draw.
+
+## Modes
+
+| Mode | What it is |
+|---|---|
+| **Human vs Human** | Pass-and-play on one screen. Pick Player 1's seat and who moves first. |
+| **Human vs Bot** | Play Random, Greedy or Monte Carlo. Pick your seat and who moves first. Each bot shows the Elo rating the tournament measured for it. |
+
+## Running it
+
+```bash
+npm install
+npm run dev        # play in the browser
+npm run check      # typecheck + lint + tests
+npm run build      # production build into dist/
+npm run bench      # time one Monte Carlo decision
+npm run sim -- --games=200 --seed=1 --bots=random,greedy,montecarlo
+npm run playouts   # Monte Carlo strength vs playout count, against Greedy
+```
+
+`npm run sim` plays every pair of bots and prints JSON: W/D/L, win rate with its 95% CI, average score difference, first-mover score, milliseconds per move, and calibrated ratings, with the first bot anchored at 800. Raw runs are in [`results/`](results/) and the findings are in [BALANCE.md](BALANCE.md).
+
+## How the bots work
+
+A bot is one function. It is called on its turn and returns the position of an empty cell, as `{ row, column }` with both from 0 to 4:
+
+```js
+function chooseMove(view, helpers) {
+  return helpers.emptyPositions(view.board)[0];
+}
+```
+
+- **`view`** is everything the bot may know: `board`, `mySeat`, `currentCard`, `nextCard`, `unseenCards`, `moveNumber`. `unseenCards` is sorted, so it says which cards are left but not their order.
+- **`helpers`** are pure functions: `emptyPositions`, `lineOf`, `evaluateHand`, `place`, and a seeded `random` and `shuffle`.
+- A bot that throws or returns anything but the position of an empty cell forfeits that game.
+
+| Bot | Strategy | Rating |
+|---|---|---|
+| Random | A random empty cell. | 800 (anchor) |
+| Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1354 |
+| Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1576 |
+
+The source is in [`src/bots/presets/`](src/bots/presets/). The ratings come from the tournament (BALANCE.md).
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph engine [src/engine: pure, deterministic]
+    game[game.ts<br/>newGame / step] --> view[botView.ts<br/>toBotView]
+    scoring[scoring.ts] --> evaluator[evaluator.ts]
+  end
+  subgraph bots [src/bots]
+    api[types.ts + api.ts<br/>bot contract + helpers] --> runner[runner.ts<br/>compile / ask / validate]
+    presets[presets/*.js<br/>random, greedy, montecarlo] -. written against .-> api
+  end
+  subgraph evaluation [src/evaluation]
+    match[match.ts<br/>paired seeds] --> stats[stats.ts<br/>CI over pairs]
+  end
+  view -- BotView only --> bots
+  match -- step --> game
+  match --> runner
+  ui[src/ui: React<br/>Human vs Human, Human vs Bot] --> game & runner
+  sim[src/sim<br/>tournament + playouts CLIs] --> match & stats
+```
+
+- **Pure engine.** `step(state, move)` returns `{ ok: true, state }` or `{ ok: false, error }`: it never throws on bad input and never mutates. A game is fully defined by `(seed, firstMover, moves[])`, and tests replay games to check it. No `Math.random` or clocks in `engine`, `bots` or `evaluation`; ESLint enforces this.
+- **No cheating.** Bots receive only a `BotView`, never the game state, so they cannot see the order of the deck.
+- **One path for every bot.** The browser game, the CLI and the tests all run bots through `runner.ts`, which validates each answer.
+- **Statistics.** Each seed is played twice with seats and first move swapped (common random numbers). The 95% CI treats each pair, not each game, as one sample.
+
+Every significant choice, with the alternatives considered, is in **[DECISIONS.md](DECISIONS.md)**.
+
+## Project layout
+
+```
+src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, game, botView
+src/bots        types (bot contract), api (helpers), runner, presets/ (3 bots + catalog)
+src/evaluation  match runner, stats (confidence interval, Elo gap)
+src/sim         tournament CLI, playouts experiment, benchmark, arg parsing, move timer
+src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, useGame
+tests           Vitest: engine, evaluator, scoring, bot API, presets, match,
+                stats, CLI args
+results         raw JSON of the runs quoted in BALANCE.md
+```
+
+## Deploying
+
+`.github/workflows/ci.yml` runs typecheck, lint, format check, tests and build on every push. On `main` it deploys `dist/` to GitHub Pages. To enable it, push the repo to GitHub and set Settings → Pages → Source to "GitHub Actions".

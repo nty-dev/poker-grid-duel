@@ -1,0 +1,38 @@
+{
+  "config": {
+    "games": 400,
+    "seed": 1,
+    "bots": [
+      "greedy",
+      "montecarlo"
+    ]
+  },
+  "pairs": [
+    {
+      "a": "greedy",
+      "b": "montecarlo",
+      "aWins": 71,
+      "draws": 32,
+      "bWins": 297,
+      "aScoreRate": 0.2175,
+      "aScoreRateCi95": [
+        0.1817,
+        0.2533
+      ],
+      "aAvgScoreDiff": -5.7425,
+      "pairScoreSd": 0.2584
+    }
+  ],
+  "firstMover": {
+    "games": 400,
+    "score": 0.47
+  },
+  "msPerMove": {
+    "greedy": 0.31,
+    "montecarlo": 18.1
+  },
+  "calibratedRatings": {
+    "greedy": 800,
+    "montecarlo": 1022
+  }
+}

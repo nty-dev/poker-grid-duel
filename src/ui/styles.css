@@ -1,0 +1,461 @@
+:root {
+  --bg: #f4f1ea;
+  --panel: #ffffff;
+  --ink: #1f2328;
+  --muted: #6b7280;
+  --line: #d8d3c7;
+  --rows: #2563eb;
+  --rows-soft: #dbe7ff;
+  --columns: #d9480f;
+  --columns-soft: #ffe4d4;
+  --felt: #1f6f50;
+  --red: #c92a2a;
+  --cell: min(15vw, 76px);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a;
+    --panel: #1f2226;
+    --ink: #e8e6e3;
+    --muted: #9aa0a6;
+    --line: #34383d;
+    --rows: #6ea0ff;
+    --rows-soft: #1f2d4a;
+    --columns: #ff8a4c;
+    --columns-soft: #47291b;
+    --felt: #164d39;
+    --red: #ff6b6b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.app {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 1.6rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+}
+
+h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.up {
+  color: #2b8a3e;
+}
+
+.down {
+  color: var(--red);
+}
+
+/* Home */
+.home {
+  display: grid;
+  gap: 16px;
+}
+
+.picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.opponent {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
+}
+
+.opponent:hover {
+  border-color: var(--columns);
+  transform: translateY(-1px);
+}
+
+.opponent-name {
+  font-weight: 600;
+}
+
+.opponent-rating {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--columns);
+}
+
+.opponent-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.rules p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+/* Game layout */
+.game {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.axis-hint {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.rows-text {
+  color: var(--rows);
+  font-weight: 600;
+}
+
+.columns-text {
+  color: var(--columns);
+  font-weight: 600;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, var(--cell)) auto;
+  grid-template-rows: repeat(5, var(--cell)) auto;
+  gap: 4px;
+  background: var(--felt);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.1s;
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.cell-open:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.cell.in-hover-row {
+  box-shadow: inset 0 0 0 2px var(--rows);
+}
+
+.cell.in-hover-col {
+  box-shadow: inset 0 0 0 2px var(--columns);
+}
+
+.cell.in-hover-row.in-hover-col {
+  box-shadow: inset 0 0 0 3px #ffd43b;
+}
+
+.line-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.row-label {
+  background: var(--rows-soft);
+  color: var(--rows);
+  min-width: 64px;
+}
+
+.col-label {
+  background: var(--columns-soft);
+  color: var(--columns);
+  align-items: center;
+  text-align: center;
+}
+
+.line-label .pts {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Cards */
+.card {
+  width: 88%;
+  height: 88%;
+  background: #fff;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.card-normal {
+  font-size: calc(var(--cell) * 0.28);
+}
+
+.card-large {
+  width: 64px;
+  height: 88px;
+  font-size: 1.5rem;
+}
+
+.card-black {
+  color: #1f2328;
+}
+
+.card-red {
+  color: #c92a2a;
+}
+
+.card-none {
+  color: var(--muted);
+  background: transparent;
+  border: 1px dashed var(--line);
+  box-shadow: none;
+}
+
+/* Sidebar */
+.sidebar,
+.game-over {
+  flex: 1 1 280px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.score {
+  display: grid;
+}
+
+.score span {
+  font-size: 0.8rem;
+}
+
+.score strong {
+  font-size: 1.8rem;
+}
+
+.score.rows {
+  color: var(--rows);
+}
+
+.score.columns {
+  color: var(--columns);
+}
+
+.turn {
+  font-weight: 600;
+}
+
+.turn-rows {
+  border-color: var(--rows);
+  color: var(--rows);
+}
+
+.turn-columns {
+  border-color: var(--columns);
+  color: var(--columns);
+}
+
+.cards {
+  display: flex;
+  gap: 24px;
+}
+
+.error {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.preview-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.9rem;
+  padding: 2px 0;
+}
+
+/* Game over */
+.game-over h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.final-score {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.line-row {
+  display: grid;
+  grid-template-columns: 3.2em 1fr auto;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+
+.line-list.rows h3 {
+  color: var(--rows);
+}
+
+.line-list.columns h3 {
+  color: var(--columns);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+  .row-label {
+    min-width: 0;
+  }
+  .line-label .hand {
+    display: none;
+  }
+}
+
+/* Navigation and setup */
+.title-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.mode-title {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.setup {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  padding: 8px 12px;
+  margin: 0;
+}
+
+legend {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.line-label.partial {
+  opacity: 0.55;
+}
+
+.error-text {
+  color: var(--red);
+  margin: 0;
+}
+
+/* Buttons */
+/* :where() keeps specificity at zero, so .secondary and other classes override it. */
+:where(button:not(.cell, .opponent, .title-link)) {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: var(--rows);
+  color: #fff;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}

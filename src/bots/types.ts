@@ -1,0 +1,37 @@
+import type { Board, BotView, Card, Cell, HandType, Position, Seed } from '../engine/types';
+
+export type ForfeitReason = 'exception' | 'invalid_move';
+
+export type BotDecision =
+  | { readonly ok: true; readonly position: Position }
+  | { readonly ok: false; readonly reason: ForfeitReason; readonly detail: string };
+
+export interface BotPlayer {
+  chooseMove(view: BotView, randomSeed: Seed): BotDecision;
+}
+
+export interface PresetBot {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly source: string;
+  readonly ratingFromTournament: number;
+}
+
+interface HandValue {
+  readonly hand: HandType;
+  readonly points: number;
+}
+
+type LineKind = 'row' | 'column';
+
+export interface BotHelpers {
+  emptyPositions(board: Board): Position[];
+  lineOf(board: Board, kind: LineKind, lineNumber: number): Cell[];
+  evaluateHand(fiveCards: readonly Card[]): HandValue;
+  place(board: Board, position: Position, card: Card): Board;
+  random(): number;
+  shuffle<T>(items: readonly T[]): T[];
+}
+
+export type ChooseMove = (view: BotView, helpers: BotHelpers) => unknown;
