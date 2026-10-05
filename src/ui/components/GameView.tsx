@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { scoreBoard } from '../../engine/scoring';
 import type { GameConfig, Position } from '../../engine/types';
-import { useGame, type Seats } from '../useGame';
+import { useBrowserGameState, type Seats } from '../browserGameState';
 import { Board } from './Board';
 import { GameOver } from './GameOver';
 import { Sidebar } from './Sidebar';
@@ -13,7 +13,7 @@ interface GameViewProps {
 }
 
 export function GameView({ config, seats, endActions }: GameViewProps) {
-  const { state, end, placeAsHuman, isHumanTurn } = useGame(config, seats);
+  const { state, end, placeAsHuman, isHumanTurn } = useBrowserGameState(config, seats);
   const [hovered, setHovered] = useState<Position | null>(null);
   const score = scoreBoard(state.board);
   const isHoveredCellEmpty =

@@ -29,7 +29,7 @@ export type GameEnd =
       readonly detail: string;
     };
 
-export function useGame(config: GameConfig, seats: Seats) {
+export function useBrowserGameState(config: GameConfig, seats: Seats) {
   const [state, setState] = useState(() => newGame(config));
   const [end, setEnd] = useState<GameEnd | null>(null);
 

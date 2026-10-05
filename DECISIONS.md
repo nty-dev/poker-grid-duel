@@ -110,7 +110,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - The local Node is 18.16, so the project pins **Vite 5 / Vitest 2** (Vite 6+ and 7 need newer Node). CI runs Node 20. One `tsconfig.json` covers app, tests and CLI to keep configuration minimal.
 
 ### D15. UI structure
-- `useGame(config, seats, onEnd)` owns one game for any mix of seats: each seat is a `Participant`, either a human or a bot behind the `Bot` interface. Human and bot moves both go through `engine.step`, and bots only get a `BotView`. A bot that forfeits, or answers something the engine rejects, loses the game rather than stalling it. Bots move after a 400 ms delay so a human can follow. `GameView` is keyed by match id, so "play again" is a clean remount. Both modes let the player choose seats and who moves first.
+- `useBrowserGameState(config, seats)` in `ui/browserGameState.ts` owns one game for any mix of seats: each seat is a `Participant`, either a human or a bot behind the `Bot` interface. Human and bot moves both go through `engine.step`, and bots only get a `BotView`. A bot that forfeits, or answers something the engine rejects, loses the game rather than stalling it. Bots move after a 400 ms delay so a human can follow. `GameView` is keyed by match id, so "play again" is a clean remount. Both modes let the player choose seats and who moves first.
 - Modes live in `ui/modes`, shared pieces in `ui/components`. The one use of `Math.random`, picking a fresh game seed, is confined to `ui/browser.ts`.
 
 ## Bots and evaluation

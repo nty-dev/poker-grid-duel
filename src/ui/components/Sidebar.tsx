@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { currentCard, nextCard } from '../../engine/gameState/readGameState';
 import { lineCells, scoreLine } from '../../engine/scoring';
 import type { BoardScore, Board, GameState, Position, Seat } from '../../engine/types';
-import type { Seats } from '../useGame';
+import type { Seats } from '../browserGameState';
 import { CardView } from './CardView';
 import { HAND_NAME } from './handNames';
 

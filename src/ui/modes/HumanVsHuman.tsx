@@ -8,7 +8,7 @@ import { otherSeat } from '../../engine/gameState/readGameState';
 import type { GameConfig, Seat } from '../../engine/types';
 import { randomGameSeed } from '../browser';
 import { GameView } from '../components/GameView';
-import { assignSeats, type Seats } from '../useGame';
+import { assignSeats, type Seats } from '../browserGameState';
 
 interface Setup {
   readonly playerOneSeat: Seat;

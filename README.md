@@ -104,7 +104,7 @@ src/engine      types, rules (board size, points table), rng, deck, evaluator, s
 src/bots        types (Bot interface), runner, presets/ (3 bots + catalog)
 src/evaluation  match runner, stats (confidence interval, Elo gap)
 src/sim         rating tournament CLI, arg parsing
-src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, useGame
+src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, browserGameState
 tests           Vitest: engine, evaluator, scoring, bot API, presets, match,
                 stats, CLI args
 results         raw JSON of the runs quoted in BALANCE.md

@@ -12,7 +12,7 @@ import { randomGameSeed } from '../browser';
 import { BotDescription } from '../components/BotDescription';
 import { GameView } from '../components/GameView';
 import { OpponentPicker } from '../components/OpponentPicker';
-import { assignSeats, type Seats } from '../useGame';
+import { assignSeats, type Seats } from '../browserGameState';
 
 interface Setup {
   readonly humanSeat: Seat;

@@ -31,17 +31,17 @@ function rankGroupSizesLargestFirst(cards: readonly Card[]): number[] {
   return [...countByRank.values()].sort((a, b) => b - a);
 }
 
-const RANK_INDEX_OF_TWO = RANKS.indexOf('2');
-const RANK_INDEX_OF_FIVE = RANKS.indexOf('5');
-const RANK_INDEX_OF_ACE = RANKS.indexOf('A');
+const ACE_COUNTED_LOW = -1;
 
 function isStraightFun(cards: readonly Card[]): boolean {
-  const rankIndexes = cards.map((card) => RANKS.indexOf(card.rank)).sort((a, b) => a - b);
-  const [lowest = 0, , , secondHighest = 0, highest = 0] = rankIndexes;
-  const isUnbrokenRun = highest - lowest === 4;
-  const isAceLowStraight =
-    lowest === RANK_INDEX_OF_TWO &&
-    secondHighest === RANK_INDEX_OF_FIVE &&
-    highest === RANK_INDEX_OF_ACE;
-  return isUnbrokenRun || isAceLowStraight;
+  const withAceHigh = cards.map((card) => RANKS.indexOf(card.rank));
+  const withAceLow = withAceHigh.map((rankIndex) =>
+    rankIndex === RANKS.indexOf('A') ? ACE_COUNTED_LOW : rankIndex,
+  );
+  return areConsecutive(withAceHigh) || areConsecutive(withAceLow);
+}
+
+function areConsecutive(numbers: readonly number[]): boolean {
+  const ascending = [...numbers].sort((a, b) => a - b);
+  return ascending.every((number, i) => i === 0 || number - 1 === ascending[i - 1]);
 }

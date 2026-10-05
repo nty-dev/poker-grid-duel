@@ -4,7 +4,7 @@ import type { ForfeitReason } from '../../bots/types';
 import { otherSeat } from '../../engine/gameState/readGameState';
 import { outcome } from '../../engine/scoring';
 import type { BoardScore, LineScore, Seat } from '../../engine/types';
-import type { GameEnd, Seats } from '../useGame';
+import type { GameEnd, Seats } from '../browserGameState';
 import { HAND_NAME } from './handNames';
 
 interface GameOverProps {
