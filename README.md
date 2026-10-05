@@ -66,7 +66,7 @@ interface Bot {
 | Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1354 |
 | Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1576 |
 
-The source is in [`src/bots/presets/`](src/bots/presets/). In the app, picking a bot in Human vs Bot shows how its algorithm works step by step, before you start the duel. The ratings come from the tournament (BALANCE.md).
+The source is in [`src/bots/presets/`](src/bots/presets/). Each bot's algorithm is explained in a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`); the app shows that text when you pick a bot in Human vs Bot, before you start the duel. The ratings come from the tournament (BALANCE.md).
 
 ## Architecture
 

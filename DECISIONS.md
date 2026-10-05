@@ -144,6 +144,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 
 ### D19. The three preset bots
 - **Decision:** `src/bots/presets/{random,greedy,montecarlo}.ts` each export a `create…Bot` function, listed with their names and ratings in `catalog.ts`. The browser, the CLI and the tests all import that catalog.
+- **Descriptions live with the bots.** Each bot has a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`) explaining its algorithm. The site's `BotDescription` component knows nothing about any particular bot: it loads the file matching the bot's id and renders it with `react-markdown` (plus `remark-gfm` for the table). A test checks every bot has one. The cost is two more dependencies and about 160 kB of JavaScript before compression.
 - **Greedy:** Same heuristic as D9. It only rescores the row and column through the candidate cell, since the other 8 lines don't change. For an unfinished line it uses the engine's `classifyHand` to find the pair, two pair or three of a kind already there, and adds its own small bonuses for hands that can still improve; those bonuses are its heuristic weights.
 - **Monte Carlo:** Same flat Monte Carlo as D10, with 100 playouts. The common random numbers cover the deck order **and** the order in which empty cells are filled. Each future fixes a permutation of all 25 cells, and a playout fills the empty ones in that order, so candidate cells differ only in the move being judged. Measured cost: 13 ms at the opening, 6 ms mid-game, about 18 ms per move averaged over games (Node, laptop).
 

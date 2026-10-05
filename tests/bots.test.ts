@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { PRESET_BOTS } from '../src/bots/presets/catalog';
 import { PRESET_IDS, type Bot, type PresetId } from '../src/bots/types';
@@ -20,6 +21,11 @@ function resultsAgainstRandom(id: PresetId, games: number) {
 }
 
 describe.each(PRESET_IDS)('%s', (id) => {
+  it('has a description for the site, next to its code', () => {
+    const description = new URL(`../src/bots/presets/${id}.md`, import.meta.url);
+    expect(readFileSync(description, 'utf8').trim()).not.toBe('');
+  });
+
   it('finishes whole games from both seats without forfeiting', () => {
     const games = runMatch(
       { A: bot(id), B: bot('random') },

@@ -119,12 +119,14 @@ h3 {
   margin-top: 14px;
 }
 
-.bot-description .formula {
+.bot-description pre {
   font-family: ui-monospace, monospace;
   font-size: 0.9rem;
   padding: 8px 10px;
+  margin: 0 0 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
+  white-space: pre-wrap;
 }
 
 .bot-description table {
