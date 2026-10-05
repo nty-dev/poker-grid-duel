@@ -1,3 +1,8 @@
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+
 export type Mode = 'humanVsHuman' | 'humanVsBot';
 
 const MODES: readonly { id: Mode; title: string; summary: string }[] = [
@@ -12,14 +17,18 @@ export function ModeSelect({ onSelect }: { onSelect(mode: Mode): void }) {
         <h2>Choose a mode</h2>
         <div className="picker">
           {MODES.map((mode) => (
-            <button key={mode.id} className="opponent" onClick={() => onSelect(mode.id)}>
-              <span className="opponent-name">{mode.title}</span>
-              <span className="opponent-desc">{mode.summary}</span>
-            </button>
+            <Card key={mode.id} variant="outlined">
+              <CardActionArea onClick={() => onSelect(mode.id)} sx={{ p: 1.5 }}>
+                <Typography sx={{ fontWeight: 600 }}>{mode.title}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {mode.summary}
+                </Typography>
+              </CardActionArea>
+            </Card>
           ))}
         </div>
       </section>
-      <section className="panel rules">
+      <Paper component="section" variant="outlined" className="rules" sx={{ p: 2 }}>
         <h2>How to play</h2>
         <p>
           Two players share a 5×5 board. One scores the five <b>rows</b> as poker hands, the other
@@ -33,7 +42,7 @@ export function ModeSelect({ onSelect }: { onSelect(mode: Mode): void }) {
           Pair 2 · Two pair 5 · Trips 10 · Flush 12 · Straight 15 · Full house 20 · Quads 40 ·
           Straight flush 60.
         </p>
-      </section>
+      </Paper>
     </main>
   );
 }

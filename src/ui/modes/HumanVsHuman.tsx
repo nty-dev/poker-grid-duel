@@ -1,3 +1,8 @@
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { otherSeat } from '../../engine/gameState/readGameState';
 import type { GameConfig, Seat } from '../../engine/types';
@@ -38,12 +43,15 @@ export function HumanVsHuman() {
         seats={startedGame.seats}
         endActions={
           <>
-            <button onClick={() => setStartedGame(startGame(setup, startedGame.gameNumber + 1))}>
+            <Button
+              variant="contained"
+              onClick={() => setStartedGame(startGame(setup, startedGame.gameNumber + 1))}
+            >
               Play again
-            </button>
-            <button className="secondary" onClick={() => setStartedGame(null)}>
+            </Button>
+            <Button variant="outlined" onClick={() => setStartedGame(null)}>
               Change setup
-            </button>
+            </Button>
           </>
         }
       />
@@ -52,40 +60,46 @@ export function HumanVsHuman() {
 
   return (
     <main className="home">
-      <section className="panel setup">
+      <Paper component="section" variant="outlined" className="setup" sx={{ p: 2 }}>
         <h2>Human vs Human</h2>
-        <fieldset>
-          <legend>Player 1 scores</legend>
-          {(['rows', 'columns'] as const).map((seat) => (
-            <label key={seat}>
-              <input
-                type="radio"
-                name="playerOneSeat"
-                checked={setup.playerOneSeat === seat}
-                onChange={() => setSetup({ ...setup, playerOneSeat: seat })}
-              />{' '}
-              {seat}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>First move</legend>
-          {[true, false].map((playerOneMovesFirst) => (
-            <label key={String(playerOneMovesFirst)}>
-              <input
-                type="radio"
-                name="firstMover"
-                checked={setup.playerOneMovesFirst === playerOneMovesFirst}
-                onChange={() => setSetup({ ...setup, playerOneMovesFirst })}
-              />{' '}
-              {playerOneMovesFirst ? 'Player 1' : 'Player 2'}
-            </label>
-          ))}
-        </fieldset>
+        <Typography variant="body2" color="text.secondary">
+          Player 1 scores
+        </Typography>
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          size="small"
+          color="primary"
+          value={setup.playerOneSeat}
+          onChange={(_event, picked: Seat | null) => {
+            if (picked !== null) setSetup({ ...setup, playerOneSeat: picked });
+          }}
+        >
+          <ToggleButton value="rows">Rows</ToggleButton>
+          <ToggleButton value="columns">Columns</ToggleButton>
+        </ToggleButtonGroup>
+        <Typography variant="body2" color="text.secondary">
+          First move
+        </Typography>
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          size="small"
+          color="primary"
+          value={setup.playerOneMovesFirst}
+          onChange={(_event, picked: boolean | null) => {
+            if (picked !== null) setSetup({ ...setup, playerOneMovesFirst: picked });
+          }}
+        >
+          <ToggleButton value={true}>Player 1</ToggleButton>
+          <ToggleButton value={false}>Player 2</ToggleButton>
+        </ToggleButtonGroup>
         <div className="actions">
-          <button onClick={() => setStartedGame(startGame(setup, 1))}>Start</button>
+          <Button variant="contained" onClick={() => setStartedGame(startGame(setup, 1))}>
+            Start
+          </Button>
         </div>
-      </section>
+      </Paper>
     </main>
   );
 }

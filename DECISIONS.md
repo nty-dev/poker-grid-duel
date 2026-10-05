@@ -192,3 +192,13 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **`BOARD_SIZE` is not freely changeable.** The evaluator classifies five-card poker hands, so another size would need a different evaluator. The file is called `rules`, not `config`, for that reason.
 - **Bots:** `bots/types.ts` holds the bot contract (`Bot`, `BotDecision`, `PresetBot`). The bots import `BOARD_SIZE` and the points table from `engine/rules.ts`; their own heuristic numbers stay with them.
 - **Evaluation:** `GameRecord` and `GameResult` stay in `match.ts`. They are that file's output, and only `stats.ts` and the CLI read them.
+
+### D30. MUI for controls and containers; hand-written CSS only for the board
+- **Context:** The setup screens used the browser's default radio buttons, and every button, card and panel was styled by hand in `styles.css`. A hand-written "option boxes" component was started to replace the radio buttons.
+- **Options:** Keep writing components by hand; a behaviour-only library (Radix, Headless UI) styled with the existing CSS; a full component library (MUI, Chakra, Ant Design, Mantine).
+- **Decision:** MUI (`@mui/material`, with `@emotion/react` and `@emotion/styled`). Buttons, the single-choice toggles (`ToggleButtonGroup`), the mode and opponent cards (`Card`) and the panels (`Paper`) are MUI components. `ui/theme.ts` gives MUI the project's own colours for light and dark mode, following the system setting.
+- **What stays hand-written:** The board, the playing cards, the hand labels and the page layout. No component library has a 5×5 card grid.
+- **Trade-offs:**
+  - The JavaScript bundle roughly doubles (about 174 kB to 317 kB before compression), for a handful of components.
+  - MUI writes its styles into the page at runtime, which is why the Content-Security-Policy keeps `'unsafe-inline'` for styles.
+  - Mantine was ruled out because it requires React 19; Radix would have been the smaller choice but leaves all styling to maintain.

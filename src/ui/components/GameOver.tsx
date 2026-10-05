@@ -1,3 +1,4 @@
+import Paper from '@mui/material/Paper';
 import type { ReactNode } from 'react';
 import type { ForfeitReason } from '../../bots/types';
 import { otherSeat } from '../../engine/gameState/readGameState';
@@ -57,7 +58,7 @@ function headlineFor(winnerName: string | null): string {
 export function GameOver({ end, score, seats, children }: GameOverProps) {
   const winner = winningSeat(end);
   return (
-    <div className="panel game-over">
+    <Paper variant="outlined" className="game-over" sx={{ p: 2 }}>
       <h2>{headlineFor(winner && seats[winner].name)}</h2>
       {end.kind === 'forfeit' && (
         <p className="error-text">
@@ -72,6 +73,6 @@ export function GameOver({ end, score, seats, children }: GameOverProps) {
         <LineScores seat="columns" ownerName={seats.columns.name} lines={score.columns} />
       </div>
       <div className="actions">{children}</div>
-    </div>
+    </Paper>
   );
 }

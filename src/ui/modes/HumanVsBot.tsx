@@ -1,3 +1,7 @@
+import Button from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { PRESET_BOTS } from '../../bots/presets/catalog';
 import type { PresetBot } from '../../bots/types';
@@ -42,6 +46,7 @@ function startGame(
 
 export function HumanVsBot() {
   const [setup, setSetup] = useState<Setup>({ humanSeat: 'rows', humanMovesFirst: true });
+  const [areSettingsOpen, setAreSettingsOpen] = useState(false);
   const [pickedBot, setPickedBot] = useState<PresetBot | null>(null);
   const [startedGame, setStartedGame] = useState<StartedGame | null>(null);
 
@@ -53,16 +58,17 @@ export function HumanVsBot() {
         seats={startedGame.seats}
         endActions={
           <>
-            <button
+            <Button
+              variant="contained"
               onClick={() =>
                 setStartedGame(startGame(setup, startedGame.opponent, startedGame.gameNumber + 1))
               }
             >
               Play again
-            </button>
-            <button className="secondary" onClick={() => setStartedGame(null)}>
+            </Button>
+            <Button variant="outlined" onClick={() => setStartedGame(null)}>
               Change opponent
-            </button>
+            </Button>
           </>
         }
       />
@@ -71,38 +77,61 @@ export function HumanVsBot() {
 
   return (
     <main className="home">
-      <section className="setup">
+      <section>
         <h2>Choose an opponent</h2>
-        <fieldset>
-          <legend>You score</legend>
-          {(['rows', 'columns'] as const).map((seat) => (
-            <label key={seat}>
-              <input
-                type="radio"
-                name="humanSeat"
-                checked={setup.humanSeat === seat}
-                onChange={() => setSetup({ ...setup, humanSeat: seat })}
-              />{' '}
-              {seat}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>First move</legend>
-          {[true, false].map((humanMovesFirst) => (
-            <label key={String(humanMovesFirst)}>
-              <input
-                type="radio"
-                name="firstMover"
-                checked={setup.humanMovesFirst === humanMovesFirst}
-                onChange={() => setSetup({ ...setup, humanMovesFirst })}
-              />{' '}
-              {humanMovesFirst ? 'You' : 'The bot'}
-            </label>
-          ))}
-        </fieldset>
+        <OpponentPicker bots={PRESET_BOTS} picked={pickedBot} onPick={setPickedBot} />
       </section>
-      <OpponentPicker bots={PRESET_BOTS} picked={pickedBot} onPick={setPickedBot} />
+      <section className="setup">
+        <div className="settings-summary">
+          <span>
+            You score the <b>{setup.humanSeat}</b> and move{' '}
+            <b>{setup.humanMovesFirst ? 'first' : 'second'}</b>.
+          </span>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setAreSettingsOpen(!areSettingsOpen)}
+          >
+            {areSettingsOpen ? 'Hide settings' : 'Change settings'}
+          </Button>
+        </div>
+        {areSettingsOpen && (
+          <>
+            <Typography variant="body2" color="text.secondary">
+              You score
+            </Typography>
+            <ToggleButtonGroup
+              exclusive
+              fullWidth
+              size="small"
+              color="primary"
+              value={setup.humanSeat}
+              onChange={(_event, picked: Seat | null) => {
+                if (picked !== null) setSetup({ ...setup, humanSeat: picked });
+              }}
+            >
+              <ToggleButton value="rows">Rows</ToggleButton>
+              <ToggleButton value="columns">Columns</ToggleButton>
+            </ToggleButtonGroup>
+            <Typography variant="body2" color="text.secondary">
+              First move
+            </Typography>
+            <ToggleButtonGroup
+              exclusive
+              fullWidth
+              size="small"
+              color="primary"
+              value={setup.humanMovesFirst}
+              onChange={(_event, picked: boolean | null) => {
+                if (picked !== null) setSetup({ ...setup, humanMovesFirst: picked });
+              }}
+            >
+              <ToggleButton value={true}>You</ToggleButton>
+              <ToggleButton value={false}>The bot</ToggleButton>
+            </ToggleButtonGroup>
+          </>
+        )}
+      </section>
       {pickedBot && (
         <BotDescription
           bot={pickedBot}

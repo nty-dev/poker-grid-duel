@@ -1,3 +1,5 @@
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
 import type { ReactNode } from 'react';
 import type { PresetBot, PresetId } from '../../bots/types';
 
@@ -158,14 +160,16 @@ interface BotDescriptionProps {
 
 export function BotDescription({ bot, onDuel }: BotDescriptionProps) {
   return (
-    <section className="panel bot-description">
+    <Paper component="section" variant="outlined" className="bot-description" sx={{ p: 2 }}>
       <div className="bot-description-heading">
         <h2>
           {bot.name} · rated {bot.ratingFromTournament}
         </h2>
-        <button onClick={onDuel}>Duel</button>
+        <Button variant="contained" onClick={onDuel}>
+          Duel
+        </Button>
       </div>
       {HOW_IT_PLAYS[bot.id]}
-    </section>
+    </Paper>
   );
 }

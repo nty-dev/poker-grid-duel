@@ -1,4 +1,5 @@
 import { withCardAt } from '../../engine/gameState/advanceGame';
+import Paper from '@mui/material/Paper';
 import { currentCard, nextCard } from '../../engine/gameState/readGameState';
 import { lineCells, scoreLine } from '../../engine/scoring';
 import type { BoardScore, Board, GameState, Position, Seat } from '../../engine/types';
@@ -52,7 +53,7 @@ function PlacementPreview({ state, seats, position }: PlacementPreviewProps) {
   const boardAfter = withCardAt(state.board, position, card);
   const { row, column } = position;
   return (
-    <div className="panel preview">
+    <Paper variant="outlined" sx={{ p: 1.5 }}>
       <h3>If placed here</h3>
       <PreviewLine
         label={`Row ${row + 1} (${seats.rows.name})`}
@@ -68,13 +69,14 @@ function PlacementPreview({ state, seats, position }: PlacementPreviewProps) {
         seat="columns"
         lineNumber={column}
       />
-    </div>
+    </Paper>
   );
 }
 
 export function Sidebar({ state, score, seats, hovered }: SidebarProps) {
   const seatToMove = state.toMove;
   const participantToMove = seats[seatToMove];
+  const colorOfSeatToMove = seatToMove === 'rows' ? 'primary.main' : 'secondary.main';
   const turnText =
     participantToMove.kind === 'bot'
       ? `${participantToMove.name} is thinking…`
@@ -82,7 +84,7 @@ export function Sidebar({ state, score, seats, hovered }: SidebarProps) {
 
   return (
     <aside className="sidebar">
-      <div className="panel scores">
+      <Paper variant="outlined" className="scores" sx={{ p: 1.5 }}>
         <div className="score rows">
           <span>{seats.rows.name} · rows</span>
           <strong>{score.total.rows}</strong>
@@ -91,13 +93,17 @@ export function Sidebar({ state, score, seats, hovered }: SidebarProps) {
           <span>{seats.columns.name} · columns</span>
           <strong>{score.total.columns}</strong>
         </div>
-      </div>
+      </Paper>
 
-      <div className={`panel turn turn-${seatToMove}`} aria-live="polite">
+      <Paper
+        variant="outlined"
+        aria-live="polite"
+        sx={{ p: 1.5, fontWeight: 600, color: colorOfSeatToMove, borderColor: colorOfSeatToMove }}
+      >
         {turnText}
-      </div>
+      </Paper>
 
-      <div className="panel cards">
+      <Paper variant="outlined" className="cards" sx={{ p: 1.5 }}>
         <div>
           <h3>Current</h3>
           <CardView card={currentCard(state)} size="large" />
@@ -106,7 +112,7 @@ export function Sidebar({ state, score, seats, hovered }: SidebarProps) {
           <h3>Next</h3>
           <CardView card={nextCard(state)} size="large" />
         </div>
-      </div>
+      </Paper>
 
       {hovered && <PlacementPreview state={state} seats={seats} position={hovered} />}
     </aside>
