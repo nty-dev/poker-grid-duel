@@ -39,17 +39,11 @@ describe('pairScoresForA', () => {
 });
 
 describe('the 95% interval', () => {
-  it('matches a calculation done by hand', () => {
-    const samples = [1, 2, 3, 4];
-    const mean = 2.5;
-    const sumOfSquaredDeviations = 1.5 ** 2 + 0.5 ** 2 + 0.5 ** 2 + 1.5 ** 2;
-    const standardDeviation = Math.sqrt(sumOfSquaredDeviations / (samples.length - 1));
-    const standardError = standardDeviation / Math.sqrt(samples.length);
-    const halfWidth = 1.959964 * standardError;
-    expect(sampleStandardDeviation(samples)).toBeCloseTo(standardDeviation, 10);
-    const interval = confidenceInterval95OfMean(samples);
-    expect(interval?.low).toBeCloseTo(mean - halfWidth, 10);
-    expect(interval?.high).toBeCloseTo(mean + halfWidth, 10);
+  it('gives the textbook answer for the samples 1, 2, 3, 4', () => {
+    expect(sampleStandardDeviation([1, 2, 3, 4])).toBeCloseTo(1.29099, 5);
+    const interval = confidenceInterval95OfMean([1, 2, 3, 4]);
+    expect(interval?.low).toBeCloseTo(1.23485, 5);
+    expect(interval?.high).toBeCloseTo(3.76515, 5);
   });
 
   it('does not exist for fewer than two samples', () => {
