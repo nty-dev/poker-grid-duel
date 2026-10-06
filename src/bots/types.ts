@@ -10,11 +10,10 @@ export type BotDecision =
   | { readonly ok: true; readonly position: Position }
   | { readonly ok: false; readonly reason: ForfeitReason; readonly detail: string };
 
-export const PRESET_IDS = ['random', 'greedy', 'montecarlo'] as const;
-export type PresetId = (typeof PRESET_IDS)[number];
+export type BotId = 'random' | 'greedy' | 'montecarlo';
 
-export interface PresetBot {
-  readonly id: PresetId;
+export interface BotCatalogEntry {
+  readonly id: BotId;
   readonly name: string;
   readonly description: string;
   readonly ratingFromTournament: number;

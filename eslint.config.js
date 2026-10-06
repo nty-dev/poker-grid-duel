@@ -32,8 +32,8 @@ export default tseslint.config(
     // and may import only the rules of the game. It cannot import what deals
     // or advances a game, a random number generator of its own, or the code
     // that runs it.
-    files: ['src/bots/presets/*.ts'],
-    ignores: ['src/bots/presets/catalog.ts'],
+    files: ['src/bots/strategies/*.ts'],
+    ignores: ['src/bots/strategies/catalog.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

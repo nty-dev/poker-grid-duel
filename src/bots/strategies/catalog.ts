@@ -1,9 +1,9 @@
-import type { PresetBot } from '../types';
+import type { BotCatalogEntry } from '../types';
 import { createGreedyBot } from './greedy';
 import { createMonteCarloBot } from './montecarlo';
 import { createRandomBot } from './random';
 
-export const PRESET_BOTS: readonly PresetBot[] = [
+export const BOT_CATALOG: readonly BotCatalogEntry[] = [
   {
     id: 'random',
     name: 'Random',

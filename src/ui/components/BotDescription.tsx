@@ -2,24 +2,24 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { PresetBot, PresetId } from '../../bots/types';
+import type { BotCatalogEntry, BotId } from '../../bots/types';
 
-const markdownByPath = import.meta.glob<string>('../../bots/presets/*.md', {
+const markdownByPath = import.meta.glob<string>('../../bots/strategies/*.md', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
 
-function descriptionMarkdown(id: PresetId): string {
-  const markdown = markdownByPath[`../../bots/presets/${id}.md`];
+function descriptionMarkdown(id: BotId): string {
+  const markdown = markdownByPath[`../../bots/strategies/${id}.md`];
   if (markdown === undefined) {
-    throw new Error(`The "${id}" bot has no description: src/bots/presets/${id}.md is missing.`);
+    throw new Error(`The "${id}" bot has no description: src/bots/strategies/${id}.md is missing.`);
   }
   return markdown;
 }
 
 interface BotDescriptionProps {
-  bot: PresetBot;
+  bot: BotCatalogEntry;
   onDuel(): void;
 }
 

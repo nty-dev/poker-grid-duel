@@ -12,6 +12,6 @@ Random is anchored at 800. Each stronger bot is chained off its match against th
 | Random vs Greedy | 2000 | 1898–46–56 | 96.1% (95.3–96.8%) | +554 | **Greedy 1354** |
 | Greedy vs Monte Carlo | 400 | 297–32–71 | 78.3% (74.7–81.8%) | +222 | **Monte Carlo 1576** |
 
-These ratings are in [`src/bots/presets/catalog.ts`](src/bots/presets/catalog.ts).
+These ratings are in [`src/bots/strategies/catalog.ts`](src/bots/strategies/catalog.ts).
 
 **Note:** these runs predate later changes to how random numbers are generated: the switch to the `seedrandom` generator, and each bot owning its own generator. Both changed which games a given seed produces. Re-running `npm run sim` gives statistically similar ratings, not the identical games recorded here: `npm run sim -- --games=200 --seed=1` currently gives 800 / 1286 / 1516. A 200-game run is a rough estimate, because near a 95% win rate a few games move the Elo gap by dozens of points.

@@ -3,8 +3,8 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { PRESET_BOTS } from '../../bots/presets/catalog';
-import type { PresetBot } from '../../bots/types';
+import { BOT_CATALOG } from '../../bots/strategies/catalog';
+import type { BotCatalogEntry } from '../../bots/types';
 import { otherSeat } from '../../engine/gameState/readGameState';
 import { createRng } from '../../engine/rng';
 import type { GameConfig, Seat } from '../../engine/types';
@@ -21,14 +21,14 @@ interface Setup {
 
 interface StartedGame {
   readonly gameNumber: number;
-  readonly opponent: PresetBot;
+  readonly opponent: BotCatalogEntry;
   readonly config: GameConfig;
   readonly seats: Seats;
 }
 
 function startGame(
   { humanSeat, humanMovesFirst }: Setup,
-  opponent: PresetBot,
+  opponent: BotCatalogEntry,
   gameNumber: number,
 ): StartedGame {
   const seats = assignSeats(
@@ -47,7 +47,7 @@ function startGame(
 export function HumanVsBot() {
   const [setup, setSetup] = useState<Setup>({ humanSeat: 'rows', humanMovesFirst: true });
   const [areSettingsOpen, setAreSettingsOpen] = useState(false);
-  const [pickedBot, setPickedBot] = useState<PresetBot | null>(null);
+  const [pickedBot, setPickedBot] = useState<BotCatalogEntry | null>(null);
   const [startedGame, setStartedGame] = useState<StartedGame | null>(null);
 
   if (startedGame) {
@@ -79,7 +79,7 @@ export function HumanVsBot() {
     <main className="home">
       <section>
         <h2>Choose an opponent</h2>
-        <OpponentPicker bots={PRESET_BOTS} picked={pickedBot} onPick={setPickedBot} />
+        <OpponentPicker bots={BOT_CATALOG} picked={pickedBot} onPick={setPickedBot} />
       </section>
       <section className="setup">
         <div className="settings-summary">

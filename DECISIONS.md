@@ -47,7 +47,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
   - `Math.random`: cannot be seeded, so it's ruled out.
   - A hand-written generator such as mulberry32 (about 10 lines, no dependency). This was the original choice.
   - A library.
-- **Decision:** The `seedrandom` library, wrapped in a tiny `Rng { nextIntBelow }` object in `engine/rng.ts`. That file is the only place that imports it. ESLint bans `Math.random`, `Date.now` and `new Date` in `src/engine`, `src/bots`, `src/evaluation` and `src/rating`, including the preset `.js` files.
+- **Decision:** The `seedrandom` library, wrapped in a tiny `Rng { nextIntBelow }` object in `engine/rng.ts`. That file is the only place that imports it. ESLint bans `Math.random`, `Date.now` and `new Date` in `src/engine`, `src/bots` and `src/evaluation`.
 - **Why a library:** The project only needs "same seed, same sequence". A well-known, widely used library provides that without hand-written bit-twiddling code to maintain.
 - **Trade-offs:**
   - One runtime dependency for what could be 10 lines.
@@ -87,7 +87,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 
 ### D11. Monte Carlo cost per move
 - **Cost:** about `emptyPositions × N × remainingPlacements` placements, plus one board score per playout. At the opening that is 25 × N × 24.
-- **Measured** (Node, laptop, with timing scripts since removed), for the preset at 100 playouts: 13 ms at the opening, 6 ms mid-game, about 18 ms per move over whole games.
+- **Measured** (Node, laptop, with timing scripts since removed), for the Monte Carlo bot at 100 playouts: 13 ms at the opening, 6 ms mid-game, about 18 ms per move over whole games.
 
 ## Rating
 
@@ -100,7 +100,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
   - Defending it cost about 400 lines: validated storage, a rating chart, and their tests.
   - A player rating belongs with multiplayer, where there are other people to compare against. That is listed as a next step.
 - **How bot ratings are derived:** A paired match gives a score rate `p` (win 1, draw ½). Under the Elo model, the rating gap that predicts that score is `400·log10(p / (1 − p))` (`eloGapFromScoreRate` in `evaluation/stats.ts`). Random is anchored at 800, and each stronger bot is rated from its match against the previous one. `p` is kept inside [0.01, 0.99], because a 100% score would mean an infinite gap. Chaining adjacent bots keeps `p` away from those extremes, where the estimate is least reliable.
-- **Trade-offs:** The ratings are fixed constants in `src/bots/presets/catalog.ts`, copied from a tournament run (BALANCE.md). They don't update when a bot changes; re-run `npm run sim` and copy the new values.
+- **Trade-offs:** The ratings are fixed constants in `src/bots/strategies/catalog.ts`, copied from a tournament run (BALANCE.md). They don't update when a bot changes; re-run `npm run sim` and copy the new values.
 
 *D13 (validated `localStorage` for the human rating) was removed with the human rating.*
 
@@ -128,8 +128,8 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Decision:** A bot is a TypeScript module implementing `Bot { chooseMove(view: BotView): Position }` (`bots/types.ts`). Three things make the firewall explicit:
   - **The signature.** The view is the bot's only input. `BotView` holds the board, the bot's seat, the current card and the next card; the deck lives only in `GameState`, which a bot is never given.
   - **One conversion point.** `askBotForMove(bot, state)` in `runner.ts` is the only code that calls a bot, and the only place a `GameState` becomes a `BotView`. It passes the bot a `structuredClone` of the view, so a bot that writes to its view cannot change the game (tested).
-  - **An import rule.** ESLint restricts the files in `src/bots/presets/` to importing `engine/{types, rules, evaluator, scoring, deck, gameState/readGameState}` and `bots/types`. Those hold the rules of the game and no secrets. Importing `advanceGame` (which deals and steps a game), `rng` (a generator of the bot's own) or the runner is a lint error.
-- **Each bot owns its random number generator.** A preset is created with `createBot(rng)` and keeps that generator for as long as it lives. The game knows nothing about it. The tournament seeds each bot from `--seed` and the bot's id, so a run is reproducible; the browser seeds it at random for each game.
+  - **An import rule.** ESLint restricts the files in `src/bots/strategies/` to importing `engine/{types, rules, evaluator, scoring, deck, gameState/readGameState}` and `bots/types`. Those hold the rules of the game and no secrets. Importing `advanceGame` (which deals and steps a game), `rng` (a generator of the bot's own) or the runner is a lint error.
+- **Each bot owns its random number generator.** A bot is created with `createBot(rng)` and keeps that generator for as long as it lives. The game knows nothing about it. The tournament seeds each bot from `--seed` and the bot's id, so a run is reproducible; the browser seeds it at random for each game.
 - **Earlier design:** The bots were plain JavaScript strings compiled with `new Function` and given a `helpers` object, because sealed-off code cannot import. That needed a helper API with its own argument checks, `'unsafe-eval'` in the Content-Security-Policy, and copies of engine constants in each bot. As modules the bots are type-checked and import the real functions.
 - **Trade-offs:**
   - This is a firewall by construction and by lint, not a sandbox: inside one JavaScript process a bot written in bad faith could still reach global objects. That is acceptable for three bots written here; untrusted bots would need a Web Worker.
@@ -139,12 +139,12 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Context:** A bot has to be called from the browser game, the tournament CLI and the tests. The rules for what counts as a legal answer must not differ between them.
 - **Decision:** `askBotForMove(bot, state)` in `runner.ts` is that one path: build the view, call the bot, catch anything it throws, then `validateBotAnswer`. Only the position of an empty cell on the board is accepted. A bot that throws or chooses anything else **forfeits** that game with reason `exception` or `invalid_move`; it never stalls or crashes the caller.
 - **The bot gets a copy:** `structuredClone(view)`, so a bot that mutates its view cannot corrupt engine state (tested).
-- **Why in-process, on the main thread:** All three presets are trusted code and take at most about 20 ms per move (D19), roughly one frame, after a 400 ms display delay. A Web Worker would add isolation and the ability to interrupt a bot, but neither is worth its complexity here: message passing, an async interface, and lifecycle management.
-- **Trade-offs:** There is no time limit, because synchronous code can't be interrupted on its own thread. A preset that looped forever would freeze the tab. If untrusted code were ever accepted, it would need a worker in the browser and OS-level isolation on a server.
+- **Why in-process, on the main thread:** All three bots are trusted code and take at most about 20 ms per move (D19), roughly one frame, after a 400 ms display delay. A Web Worker would add isolation and the ability to interrupt a bot, but neither is worth its complexity here: message passing, an async interface, and lifecycle management.
+- **Trade-offs:** There is no time limit, because synchronous code can't be interrupted on its own thread. A bot that looped forever would freeze the tab. If untrusted code were ever accepted, it would need a worker in the browser and OS-level isolation on a server.
 
-### D19. The three preset bots
-- **Decision:** `src/bots/presets/{random,greedy,montecarlo}.ts` each export a `create…Bot` function, listed with their names and ratings in `catalog.ts`. The browser, the CLI and the tests all import that catalog.
-- **Descriptions live with the bots.** Each bot has a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`) explaining its algorithm. The site's `BotDescription` component knows nothing about any particular bot: it loads the file matching the bot's id and renders it with `react-markdown` (plus `remark-gfm` for the table). A test checks every bot has one. The cost is two more dependencies and about 160 kB of JavaScript before compression.
+### D19. The three bots
+- **Decision:** `src/bots/strategies/{random,greedy,montecarlo}.ts` each export a `create…Bot` function, listed with their names and ratings in `catalog.ts`. The browser, the CLI and the tests all import that catalog.
+- **Descriptions live with the bots.** Each bot has a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`) explaining its algorithm. The site's `BotDescription` component knows nothing about any particular bot: it loads the file matching the bot's id and renders it with `react-markdown` (plus `remark-gfm` for the table). The cost is two more dependencies and about 160 kB of JavaScript before compression.
 - **Greedy:** Same heuristic as D9. It only rescores the row and column through the candidate cell, since the other 8 lines don't change. For an unfinished line it uses the engine's `classifyHand` to find the pair, two pair or three of a kind already there, and adds its own small bonuses for hands that can still improve; those bonuses are its heuristic weights.
 - **Monte Carlo:** Same flat Monte Carlo as D10, with 100 playouts. The common random numbers cover the deck order **and** the order in which empty cells are filled. Each future fixes a permutation of all 25 cells, and a playout fills the empty ones in that order, so candidate cells differ only in the move being judged. Measured cost: 13 ms at the opening, 6 ms mid-game, about 18 ms per move averaged over games (Node, laptop).
 
@@ -181,7 +181,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
 - **Decision:** Labels. `RANKS` lists them lowest to highest, and a rank's order is its index there. Order is looked up in two places: `isStraightFun` in the evaluator, and Greedy's straight-draw check. Equality needs no conversion.
 - **Trade-offs:**
   - Logged and stored cards are readable (`{ rank: 'K', suit: 'H' }`), and the display mappings are gone, apart from showing `'T'` as "10".
-  - The straight check pays one lookup per card. Measured on the Monte Carlo preset, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11 and D19 were taken before this change.
+  - The straight check pays one lookup per card. Measured on the Monte Carlo bot, a move takes about 19–21 ms instead of 14–16 ms (Node, laptop). The timings quoted in D11 and D19 were taken before this change.
   - Behaviour is unchanged: the same seeds produce exactly the same tournament results before and after.
 
 ### D29. Where definitions live
@@ -191,7 +191,7 @@ Each entry: **Context · Options · Decision · Trade-offs.**
   - `SUITS` and `RANKS` stay in `types.ts`. They define what a card is, and the `Suit` and `Rank` types are derived from them.
   - Numbers owned by one module stay with it: `PLAYOUTS` and the Greedy bonuses in the bots, the bot move delay in the UI.
 - **`BOARD_SIZE` is not freely changeable.** The evaluator classifies five-card poker hands, so another size would need a different evaluator. The file is called `rules`, not `config`, for that reason.
-- **Bots:** `bots/types.ts` holds the bot contract (`Bot`, `BotDecision`, `PresetBot`). The bots import `BOARD_SIZE` and the points table from `engine/rules.ts`; their own heuristic numbers stay with them.
+- **Bots:** `bots/types.ts` holds the bot contract (`Bot`, `BotDecision`, `BotCatalogEntry`). The bots import `BOARD_SIZE` and the points table from `engine/rules.ts`; their own heuristic numbers stay with them.
 - **Evaluation:** `GameRecord` and `GameResult` stay in `match.ts`. They are that file's output, and only `stats.ts` and the CLI read them.
 
 ### D30. MUI for controls and containers; hand-written CSS only for the board

@@ -1,12 +1,12 @@
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import Typography from '@mui/material/Typography';
-import type { PresetBot } from '../../bots/types';
+import type { BotCatalogEntry } from '../../bots/types';
 
 interface OpponentPickerProps {
-  bots: readonly PresetBot[];
-  picked: PresetBot | null;
-  onPick(bot: PresetBot): void;
+  bots: readonly BotCatalogEntry[];
+  picked: BotCatalogEntry | null;
+  onPick(bot: BotCatalogEntry): void;
 }
 
 export function OpponentPicker({ bots, picked, onPick }: OpponentPickerProps) {

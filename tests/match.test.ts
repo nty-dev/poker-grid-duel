@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createGreedyBot } from '../src/bots/presets/greedy';
-import { createRandomBot } from '../src/bots/presets/random';
+import { createGreedyBot } from '../src/bots/strategies/greedy';
+import { createRandomBot } from '../src/bots/strategies/random';
 import type { Bot } from '../src/bots/types';
 import { emptyPositions } from '../src/engine/gameState/readGameState';
 import { createRng } from '../src/engine/rng';

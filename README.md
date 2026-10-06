@@ -57,7 +57,7 @@ interface Bot {
 
 - **`view`** is everything the bot is told: `board`, `mySeat`, `currentCard`, `nextCard`. It holds nothing from the rest of the deck; a bot that wants the cards still to come works them out from what it can see.
 - **Randomness** comes from a seeded generator handed to the bot when it is created (`createBot(rng)`), so a tournament run can be repeated exactly.
-- **The firewall.** A bot never receives the game state, and an ESLint rule limits what the files in `src/bots/presets/` may import to the rules of the game: types, points table, hand evaluator, scoring, the deck and read-only board functions. Importing what deals or advances a game fails `npm run check`.
+- **The firewall.** A bot never receives the game state, and an ESLint rule limits what the files in `src/bots/strategies/` may import to the rules of the game: types, points table, hand evaluator, scoring, the deck and read-only board functions. Importing what deals or advances a game fails `npm run check`.
 - A bot that throws or chooses anything but an empty cell forfeits that game.
 
 | Bot | Strategy | Rating |
@@ -66,7 +66,7 @@ interface Bot {
 | Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1354 |
 | Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1576 |
 
-The source is in [`src/bots/presets/`](src/bots/presets/). Each bot's algorithm is explained in a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`); the app shows that text when you pick a bot in Human vs Bot, before you start the duel. The ratings come from the tournament (BALANCE.md).
+The source is in [`src/bots/strategies/`](src/bots/strategies/). Each bot's algorithm is explained in a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`); the app shows that text when you pick a bot in Human vs Bot, before you start the duel. The ratings come from the tournament (BALANCE.md).
 
 ## Architecture
 
@@ -77,7 +77,7 @@ flowchart LR
     scoring[scoring.ts] --> evaluator[evaluator.ts]
   end
   subgraph bots [src/bots]
-    presets[presets/*.ts<br/>random, greedy, montecarlo] -. implement .-> contract[types.ts<br/>Bot interface]
+    strategies[strategies/*.ts<br/>random, greedy, montecarlo] -. implement .-> contract[types.ts<br/>Bot interface]
     runner[runner.ts<br/>state to view / ask / validate] --> contract
   end
   subgraph evaluation [src/evaluation]
@@ -101,11 +101,11 @@ Every significant choice, with the alternatives considered, is in **[DECISIONS.m
 
 ```
 src/engine      types, rules (board size, points table), rng, deck, evaluator, scoring, botView, gameState/ (advanceGame, readGameState)
-src/bots        types (Bot interface), runner, presets/ (3 bots + catalog)
+src/bots        types (Bot interface), runner, strategies/ (3 bots, their descriptions, catalog)
 src/evaluation  match runner, stats (confidence interval, Elo gap)
 src/sim         rating tournament CLI, arg parsing
 src/ui          App, modes/ (HumanVsHuman, HumanVsBot), components/, browserGameState
-tests           Vitest: engine, evaluator, scoring, bot API, presets, match,
+tests           Vitest: game state, evaluator, scoring, bot runner, bots, match,
                 stats, CLI args
 results         raw JSON of the runs quoted in BALANCE.md
 ```
