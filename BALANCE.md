@@ -2,7 +2,7 @@
 
 These are the ratings shown in the opponent picker. They come from `npm run sim`, which runs on the paired-seed match runner in `src/evaluation`. Raw output is in [`results/`](results/).
 
-A match of N games is N/2 **pairs**. Both games of a pair use one seed, with seats and first move swapped (DECISIONS.md D22). "Win rate" counts a draw as ½. CIs are 95% normal intervals over pairs (D23).
+A match of N games is N/2 **pairs**. Both games of a pair use one seed, with seats and first move swapped. "Win rate" counts a draw as ½. CIs are 95% normal intervals over pairs.
 
 Random is anchored at 800. Each stronger bot is chained off its match against the previous one with `gap = 400·log10(p/(1−p))`, where `p` is its win rate.
 

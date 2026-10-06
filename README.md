@@ -95,8 +95,6 @@ flowchart LR
 - **One path for every bot.** The browser game, the CLI and the tests all run bots through `runner.ts`, which validates each answer.
 - **Statistics.** Each seed is played twice with seats and first move swapped (common random numbers). The 95% CI treats each pair, not each game, as one sample.
 
-Every significant choice, with the alternatives considered, is in **[DECISIONS.md](DECISIONS.md)**.
-
 ## Project layout
 
 ```
