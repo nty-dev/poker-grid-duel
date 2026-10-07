@@ -9,9 +9,9 @@ Random is anchored at 800. Each stronger bot is chained off its match against th
 | Match (stronger bot second) | Games | W–D–L (stronger) | Stronger's win rate (95% CI) | Elo gap | Rating |
 |---|---|---|---|---|---|
 | — | | | | | **Random 800** |
-| Random vs Greedy | 2000 | 1898–46–56 | 96.1% (95.3–96.8%) | +554 | **Greedy 1354** |
-| Greedy vs Monte Carlo | 400 | 297–32–71 | 78.3% (74.7–81.8%) | +222 | **Monte Carlo 1576** |
+| Random vs Greedy | 2000 | 1871–48–81 | 94.8% (93.8–95.7%) | +503 | **Greedy 1303** |
+| Greedy vs Monte Carlo | 2000 | 1475–128–397 | 77.0% (75.4–78.6%) | +209 | **Monte Carlo 1512** |
 
 These ratings are in [`src/bots/strategies/catalog.ts`](src/bots/strategies/catalog.ts).
 
-**Note:** these runs predate later changes to how random numbers are generated: the switch to the `seedrandom` generator, and each bot owning its own generator. Both changed which games a given seed produces. Re-running `npm run sim` gives statistically similar ratings, not the identical games recorded here: `npm run sim -- --games=200 --seed=1` currently gives 800 / 1286 / 1516. A 200-game run is a rough estimate, because near a 95% win rate a few games move the Elo gap by dozens of points.
+Both matches come from one run, `npm run sim -- --games=2000 --seed=1`, saved as [`results/tournament-games2000-seed1.json`](results/tournament-games2000-seed1.json). Running the same command again reproduces it exactly.

@@ -21,14 +21,14 @@ describe('scoreBoard', () => {
   it('totals the rows for one seat and the columns for the other', () => {
     const score = scoreBoard(
       boardFrom([
-        '2H 4H 6H 8H JH', // flush 12
-        '5S 6D 7C 8S 9S', // straight 15
+        '2H 4H 6H 8H JH', // flush 15
+        '5S 6D 7C 8S 9S', // straight 12
         'QS QH 3C 3S 4D', // two pair 5
         'AC AH AD AS 7H', // four of a kind 40
         '3D TC 7D KH 9H', // nothing
       ]),
     );
-    expect(score.total.rows).toBe(12 + 15 + 5 + 40);
+    expect(score.total.rows).toBe(15 + 12 + 5 + 40);
     // Columns 3, 4 and 5 each hold one pair (7s, 8s, 9s).
     expect(score.total.columns).toBe(2 + 2 + 2);
   });

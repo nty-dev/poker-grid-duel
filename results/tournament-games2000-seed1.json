@@ -1,0 +1,39 @@
+{
+  "config": {
+    "games": 2000,
+    "seed": 1
+  },
+  "matches": [
+    {
+      "bot": "greedy",
+      "against": "random",
+      "wins": 1871,
+      "draws": 48,
+      "losses": 81,
+      "scoreRate": 0.9475,
+      "scoreRateCi95": [
+        0.9384,
+        0.9566
+      ],
+      "eloGap": 503
+    },
+    {
+      "bot": "montecarlo",
+      "against": "greedy",
+      "wins": 1475,
+      "draws": 128,
+      "losses": 397,
+      "scoreRate": 0.7695,
+      "scoreRateCi95": [
+        0.7535,
+        0.7855
+      ],
+      "eloGap": 209
+    }
+  ],
+  "calibratedRatings": {
+    "random": 800,
+    "greedy": 1303,
+    "montecarlo": 1512
+  }
+}

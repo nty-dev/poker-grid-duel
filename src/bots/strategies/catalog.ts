@@ -15,14 +15,14 @@ export const BOT_CATALOG: readonly BotCatalogEntry[] = [
     id: 'greedy',
     name: 'Greedy',
     description: 'Best immediate change in line potential, mine minus yours.',
-    ratingFromTournament: 1354,
+    ratingFromTournament: 1303,
     createBot: createGreedyBot,
   },
   {
     id: 'montecarlo',
     name: 'Monte Carlo',
     description: 'Plays 100 random futures per candidate cell.',
-    ratingFromTournament: 1576,
+    ratingFromTournament: 1512,
     createBot: createMonteCarloBot,
   },
 ];

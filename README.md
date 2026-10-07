@@ -18,8 +18,8 @@ You can play a friend on one screen, or play one of three bots: Random, Greedy a
 | Pair | 2 |
 | Two pair | 5 |
 | Three of a kind | 10 |
-| Flush | 12 |
-| Straight (A-low and A-high, no wrap) | 15 |
+| Straight (A-low and A-high, no wrap) | 12 |
+| Flush | 15 |
 | Full house | 20 |
 | Four of a kind | 40 |
 | Straight flush | 60 |
@@ -63,8 +63,8 @@ interface Bot {
 | Bot | Strategy | Rating |
 |---|---|---|
 | Random | A random empty cell. | 800 (anchor) |
-| Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1354 |
-| Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1576 |
+| Greedy | Tries the card in every empty cell and keeps the one that most improves its own line's potential minus the opponent's. No lookahead. | 1303 |
+| Monte Carlo | For every empty cell, finishes the game at random 100 times on the same sampled futures and keeps the cell with the best average score difference. | 1512 |
 
 The source is in [`src/bots/strategies/`](src/bots/strategies/). Each bot's algorithm is explained in a Markdown file beside its code (`random.md`, `greedy.md`, `montecarlo.md`); the app shows that text when you pick a bot in Human vs Bot, before you start the duel. The ratings come from the tournament (BALANCE.md).
 

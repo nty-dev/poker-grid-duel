@@ -39,7 +39,7 @@ export function ModeSelect({ onSelect }: { onSelect(mode: Mode): void }) {
           players. The game ends when all 25 cells are full.
         </p>
         <p>
-          Pair 2 · Two pair 5 · Trips 10 · Flush 12 · Straight 15 · Full house 20 · Quads 40 ·
+          Pair 2 · Two pair 5 · Trips 10 · Straight 12 · Flush 15 · Full house 20 · Quads 40 ·
           Straight flush 60.
         </p>
       </Paper>
