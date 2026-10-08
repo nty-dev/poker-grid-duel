@@ -22,11 +22,3 @@ A finished hand of five cards is worth its poker points. An unfinished hand is w
 | One pair | 2, plus 1 because it can improve |
 | Two or more cards, all the same suit | plus 1 per card: a flush is still possible |
 | Two or more cards that fit inside one straight | plus 1 per card: a straight is still possible |
-
-The bonuses are small on purpose, so a hand that is already made always counts for more than one that is only hoped for.
-
-To decide whether cards fit inside one straight, Greedy checks that no two share a rank, then tries each of the ten straights from A-2-3-4-5 to 10-J-Q-K-A.
-
-### Where it falls short
-
-Greedy never looks past the card it is placing. It ignores the next card, and it values a possible hand the same however likely that hand is: three hearts in a row earn the same bonus whether ten hearts are left in the deck or one.
